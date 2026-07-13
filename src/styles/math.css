@@ -73,13 +73,24 @@
 .mbinom .mparen { font-size: 1.6em; font-weight: var(--w-thin); }
 .mbinom-col { display: inline-flex; flex-direction: column; text-align: center; padding-inline: 0.1em; font-size: 0.9em; }
 
-/* boxed result */
+/* boxed result — the final answer, framed like a teacher's boxed conclusion */
 .mboxed {
   display: inline-block;
   border: 1.5px solid var(--accent);
   border-radius: 6px;
   padding: 0.2em 0.5em;
   background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+/* highlighted value — a soft highlighter mark on the key result of a step */
+.mhl {
+  padding: 0.04em 0.3em;
+  border-radius: 5px;
+  background: var(--accent-wash-2);
+  color: var(--accent-ink);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* cases */

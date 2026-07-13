@@ -83,6 +83,13 @@ const books: (1 | 2)[] = [1, 2];
 
   .curr__cta { margin-block-start: var(--s-6); }
 
+  /* on phones the two long book labels don't fit a single pill row: stack them
+     full-width so each label gets its own line and stays tappable */
+  @media (max-width: 559px) {
+    .curr__tabs { display: grid; grid-template-columns: 1fr; width: 100%; border-radius: var(--r-card); }
+    .curr__tab { text-align: center; }
+  }
+
   @media (min-width: 560px) { .curr__grid { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 960px) {
     .curr__head { grid-template-columns: 1fr auto; align-items: end; }

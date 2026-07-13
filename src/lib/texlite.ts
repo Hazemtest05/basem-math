@@ -147,6 +147,12 @@ function parse(s: string): string {
         out += `<span class="mboxed">${parse(g.body)}</span>`;
         continue;
       }
+      if (cmd === 'hl' || cmd === 'mark') {
+        // highlight the key value in a step (a soft "highlighter pen" mark)
+        const g = readArgGroup(s, i); i = g.next;
+        out += `<span class="mhl">${parse(g.body)}</span>`;
+        continue;
+      }
       if (cmd === 'begin' || cmd === 'end') {
         const g = readArgGroup(s, i); i = g.next; // consume {cases} etc.
         if (cmd === 'begin' && g.body === 'cases') {

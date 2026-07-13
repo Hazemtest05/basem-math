@@ -4,6 +4,7 @@ import '@/styles/math.css';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
 import Loader from '@/components/Loader.astro';
+import BackgroundShapes from '@/components/BackgroundShapes.astro';
 import { site } from '@/config/site';
 import { teacher, usingPlaceholders } from '@/config/teacher';
 
@@ -93,6 +94,7 @@ const jsonLd = {
   <body>
     <a href="#main" class="skip-link">تخطَّ إلى المحتوى</a>
     <div class="graph-bg" aria-hidden="true"></div>
+    <BackgroundShapes />
 
     {loader && <Loader />}
 

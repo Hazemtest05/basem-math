@@ -133,6 +133,13 @@ svg { height: auto; }
 button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: none; }
 a { color: inherit; text-decoration: none; }
+
+/* Touch: kill the default grey/blue tap flash. We drive press feedback through
+   :active transforms and :focus-visible outlines, so the native highlight only
+   muddies the brand surfaces. */
+:where(a, button, input, textarea, select, label, summary, [role='button'], [role='tab'], [tabindex]) {
+  -webkit-tap-highlight-color: transparent;
+}
 ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
 :where(h1, h2, h3, h4) { line-height: var(--lh-tight); font-weight: var(--w-reg); text-wrap: balance; }
 p { text-wrap: pretty; }
@@ -195,6 +202,11 @@ p { text-wrap: pretty; }
    ========================================================================= */
 .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
 .section { position: relative; z-index: var(--z-content); padding-block: clamp(3.5rem, 8vw, 8rem); }
+
+/* in-page anchors (e.g. the hero's "watch a solved example" → #tangent) must land
+   below the 68px sticky header, not tucked under it. Matches the explorer's own
+   scroll-margin so every jump target clears the nav. */
+:where(section, main, h2, h3)[id] { scroll-margin-block-start: 84px; }
 .stack > * + * { margin-block-start: var(--flow, var(--s-5)); }
 .measure { max-width: var(--maxw-text); }
 
@@ -393,10 +405,12 @@ p { text-wrap: pretty; }
 @media (min-width: 620px) {
   .demo__grid { grid-template-columns: 1.15fr 0.85fr; }
 }
-/* coarse pointers (touch): guarantee comfortable tap targets on demo controls */
+/* coarse pointers (touch): guarantee comfortable tap targets on demo controls.
+   The thin visible track stays vertically centred, so only the grab zone grows. */
 @media (pointer: coarse) {
   .demo__seg-btn { padding-block: 0.6em; }
   .demo__btn { padding-block: 0.72em; }
+  .demo input[type='range'] { block-size: 44px; }
 }
 
 /* =========================================================================

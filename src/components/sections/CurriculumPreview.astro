@@ -63,7 +63,7 @@ const books: (1 | 2)[] = [1, 2];
   .curr__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-4); }
   .curr__panel[hidden] { display: none; }
   .curr__panel:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 6px; border-radius: var(--r-card); }
-  @media (pointer: coarse) { .curr__tab { padding-block: 0.7em; } }
+  @media (pointer: coarse) { .curr__tab { padding-block: 0.7em; min-block-size: 44px; display: inline-flex; align-items: center; justify-content: center; } }
   .ucard { height: 100%; }
   .ucard__link {
     display: grid; gap: var(--s-2); height: 100%; padding: var(--s-5);

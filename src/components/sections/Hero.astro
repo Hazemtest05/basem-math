@@ -144,6 +144,10 @@ import Icon from '@/components/Icon.astro';
   @media (min-width: 940px) {
     .hero__grid { grid-template-columns: 1.05fr 0.95fr; }
   }
+  /* touch: 44px grab zone for the scrub (thin track stays centred) */
+  @media (pointer: coarse) {
+    input[type='range'][data-hero-range] { block-size: 44px; }
+  }
 </style>
 
 <script>

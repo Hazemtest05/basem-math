@@ -194,6 +194,10 @@ for (let yv = Math.ceil(ymin); yv <= Math.floor(ymax); yv++) yticks.push(yv);
     .lesson__work { grid-template-columns: 0.9fr 1.1fr; gap: clamp(2rem, 5vw, 4rem); }
     .lesson__stage { position: sticky; top: 88px; }
   }
+  /* touch: 44px grab zone for the h-slider (thin track stays centred) */
+  @media (pointer: coarse) {
+    input[type='range'][data-h-range] { block-size: 44px; }
+  }
 </style>
 
 <script>

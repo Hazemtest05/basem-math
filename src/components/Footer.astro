@@ -82,4 +82,12 @@ const year = 2026; // static build stamp; update per release
     .foot__grid { grid-template-columns: 1.5fr 1fr 1fr 1.4fr; }
     .foot__brand { grid-column: 1; }
   }
+
+  /* touch: the footer link lists are the densest tap zone on the page. Give each
+     link a full 44px target and a touch more row spacing so thumbs don't misfire. */
+  @media (pointer: coarse) {
+    /* fill the column so the whole row is tappable, not just the short label */
+    .foot__link { min-block-size: 44px; display: flex; width: fit-content; min-width: min(100%, 12rem); }
+    .foot__col ul { gap: var(--s-4); }
+  }
 </style>

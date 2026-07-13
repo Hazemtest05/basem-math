@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 // Static, zero-JS-by-default educational site.
 // Interactive pieces are progressively-enhanced vanilla-TS islands loaded per-page.
 export default defineConfig({
-  site: 'https://ustath-riyadiyat.example',
+  site: 'https://math.hazem.ae',
   trailingSlash: 'ignore',
   build: {
     inlineStylesheets: 'auto',

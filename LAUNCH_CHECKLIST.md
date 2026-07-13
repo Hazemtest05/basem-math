@@ -38,11 +38,13 @@ leaving them as-is has no visible effect: `phone`, `yearsExperience`, `bookingUr
 
 ## 2. Domain & URLs
 
-Two files reference the placeholder domain `ustath-riyadiyat.example`. Both must point at the real domain,
-or canonical tags, sitemap, and social previews will be wrong.
+Production domain: **`https://math.hazem.ae`** (set 2026-07-13). Canonical tags, OG `url`, sitemap, and
+robots all resolve from `astro.config.mjs` `site`.
 
-- [ ] `astro.config.mjs` → `site: 'https://your-real-domain'` (fixes canonical, OG `url`, and `sitemap.xml`)
-- [ ] `public/robots.txt` → update the `Sitemap:` line to `https://your-real-domain/sitemap.xml`
+- [x] `astro.config.mjs` → `site: 'https://math.hazem.ae'` (fixes canonical, OG `url`, and `sitemap.xml`)
+- [x] `public/robots.txt` → `Sitemap: https://math.hazem.ae/sitemap.xml`
+- [ ] In Cloudflare Pages → **basem-math** → Custom domains, add `math.hazem.ae`, then add the CNAME it
+      shows you at the `hazem.ae` DNS registrar (Host `math` → the `…pages.dev` target). Wait for SSL.
 
 ---
 

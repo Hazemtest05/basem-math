@@ -1,0 +1,204 @@
+---
+import { units, unitsByBook, BOOK_TITLES, DIFFICULTY_LABEL } from '@/data/curriculum';
+import { demosBySlug } from '@/data/interactiveDemos';
+import UnitGlyph from '@/components/UnitGlyph.astro';
+import Formula from '@/components/Math.astro';
+import InteractiveDemo from '@/components/InteractiveDemo.astro';
+import Icon from '@/components/Icon.astro';
+const books: (1 | 2)[] = [1, 2];
+const first = units[0].slug;
+---
+<div class="explorer" data-explorer data-default={first}>
+  <!-- INDEX RAIL -->
+  <nav class="explorer__rail" aria-label="فهرس الوحدات">
+    {books.map((b) => (
+      <div class="explorer__book">
+        <p class="explorer__book-title">{b === 1 ? 'الكتاب الأول · التحليل' : 'الكتاب الثاني · الهندسة والعقديّات'}</p>
+        <ul role="list" class="explorer__book-list">
+          {unitsByBook(b).map((u) => (
+            <li>
+              <a class="railitem" href={`#${u.slug}`} data-unit-tab={u.slug}>
+                <span class="railitem__glyph"><UnitGlyph motif={u.motif} size={26} /></span>
+                <span class="railitem__label">{u.titleAr}</span>
+                <span class="railitem__no num">{u.unitNo}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </nav>
+
+  <!-- DETAIL PANEL -->
+  <div class="explorer__panel">
+    {units.map((u) => (
+      <article class="udetail" id={u.slug} data-unit-detail={u.slug} tabindex="-1">
+        <div class="udetail__top">
+          <span class="udetail__glyph"><UnitGlyph motif={u.motif} size={62} /></span>
+          <div>
+            <p class="udetail__meta">
+              <span class="num">{BOOK_TITLES[u.book].en === 'Analysis' ? 'الكتاب الأول' : 'الكتاب الثاني'} · وحدة {u.unitNo}</span>
+              <span class:list={['udetail__diff', `d${u.difficulty}`]}>{DIFFICULTY_LABEL[u.difficulty]}</span>
+            </p>
+            <h2 class="udetail__title thin">{u.titleAr}</h2>
+            <p class="udetail__en ltr">{u.titleEn}</p>
+          </div>
+        </div>
+
+        <p class="udetail__hook">{u.hook}</p>
+
+        {demosBySlug[u.slug] && <InteractiveDemo {...demosBySlug[u.slug]} />}
+
+        <div class="udetail__cols">
+          <section class="udetail__block" aria-label="أهم القوانين">
+            <h3 class="udetail__h3">أهمّ القوانين</h3>
+            <ul role="list" class="udetail__formulas">
+              {u.keyFormulas.map((fm) => (
+                <li class="fplate">
+                  <span class="fplate__math"><Formula tex={fm.latex} /></span>
+                  <span class="fplate__label">{fm.label}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <div class="udetail__side">
+            <section class="udetail__block" aria-label="ماذا ستتقن">
+              <h3 class="udetail__h3">ماذا ستتقن</h3>
+              <ul role="list" class="udetail__skills">
+                {u.skills.map((sk) => (<li><Icon name="check" size={16} /> {sk}</li>))}
+              </ul>
+            </section>
+
+            <section class="udetail__block" aria-label="الدروس">
+              <h3 class="udetail__h3"><span class="num">{u.lessonsAr.length}</span> دروس</h3>
+              <ol role="list" class="udetail__lessons">
+                {u.lessonsAr.map((ls, i) => (<li><span class="num udetail__lesson-n">{i + 1}</span>{ls}</li>))}
+              </ol>
+            </section>
+
+            <section class="udetail__block" aria-label="مصطلحات">
+              <h3 class="udetail__h3">مصطلحات بالإنكليزية</h3>
+              <ul role="list" class="udetail__terms">
+                {u.englishTerms.map((t) => (<li class="tag"><span>{t.ar}</span><span class="udetail__term-en ltr">{t.en}</span></li>))}
+              </ul>
+            </section>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>
+
+<style>
+  .explorer { display: grid; grid-template-columns: 1fr; gap: var(--s-6); }
+
+  .explorer__book + .explorer__book { margin-block-start: var(--s-6); }
+  .explorer__book-title { font-size: var(--fs-small); color: var(--ink-3); margin-block-end: var(--s-3); }
+  .explorer__book-list { display: grid; gap: 2px; }
+  .railitem {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--s-3);
+    padding: var(--s-3) var(--s-3);
+    border-radius: var(--r-control); color: var(--ink-2);
+    border: 1px solid transparent;
+    transition: background var(--dur-1) var(--ease), color var(--dur-1);
+  }
+  .railitem:hover { background: var(--paper-2); color: var(--ink); }
+  .railitem.is-active { background: var(--raised); border-color: var(--line-strong); color: var(--ink); }
+  .railitem.is-active .railitem__glyph { color: var(--accent); }
+  .railitem__label { font-size: var(--fs-small); }
+  .railitem__no { color: var(--ink-3); font-size: var(--fs-small); }
+
+  .udetail {
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card);
+    scroll-margin-top: 88px;
+  }
+  .udetail + .udetail { margin-block-start: var(--s-5); }
+  .udetail:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; }
+  .udetail__top { display: flex; align-items: center; gap: var(--s-5); }
+  .udetail__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); color: var(--ink-3); font-size: var(--fs-small); }
+  .udetail__diff { padding: 0.2em 0.7em; border-radius: var(--r-pill); border: 1px solid var(--line-strong); }
+  .udetail__diff.d1 { color: var(--ok); background: var(--ok-wash); border-color: transparent; }
+  .udetail__diff.d3 { color: var(--accent-ink); background: var(--accent-wash); border-color: transparent; }
+  .udetail__title { font-size: var(--fs-h2); margin-block-start: var(--s-2); }
+  .udetail__en { color: var(--ink-3); font-size: var(--fs-small); }
+  .udetail__hook { margin-block: var(--s-5); color: var(--ink-2); font-size: var(--fs-lead); line-height: 1.5; max-width: 60ch; }
+
+  .udetail__cols { display: grid; grid-template-columns: 1fr; gap: var(--s-6); }
+  .udetail__h3 { font-size: var(--fs-small); color: var(--accent-ink); margin-block-end: var(--s-4); }
+  .udetail__formulas { display: grid; gap: var(--s-3); }
+  .fplate {
+    display: grid; gap: var(--s-2);
+    padding: var(--s-4) var(--s-5);
+    background: var(--paper-2); border: 1px solid var(--line);
+    border-radius: var(--r-card); overflow-x: auto;
+  }
+  .fplate__math { font-size: 1.05em; }
+  .fplate__label { color: var(--ink-2); font-size: var(--fs-small); }
+
+  .udetail__side { display: grid; gap: var(--s-6); align-content: start; }
+  .udetail__skills { display: grid; gap: var(--s-3); }
+  .udetail__skills li { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); align-items: start; color: var(--ink-2); font-size: var(--fs-small); }
+  .udetail__skills :global(.icon) { color: var(--ok); margin-block-start: 0.15em; }
+  .udetail__lessons { display: grid; gap: var(--s-2); }
+  .udetail__lessons li { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); color: var(--ink); font-size: var(--fs-small); }
+  .udetail__lesson-n { color: var(--ink-3); }
+  .udetail__terms { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .udetail__terms .tag { gap: var(--s-2); }
+  .udetail__term-en { color: var(--ink-3); }
+
+  @media (min-width: 720px) {
+    .udetail__cols { grid-template-columns: 1.1fr 0.9fr; gap: var(--s-7); }
+  }
+  @media (min-width: 1040px) {
+    .explorer { grid-template-columns: 280px 1fr; gap: var(--s-8); align-items: start; }
+    .explorer__rail { position: sticky; top: 88px; max-height: calc(100dvh - 108px); overflow-y: auto; padding-inline-end: var(--s-2); }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-explorer]') as HTMLElement | null;
+  if (root) {
+    const details = Array.from(root.querySelectorAll('[data-unit-detail]')) as HTMLElement[];
+    const tabs = Array.from(root.querySelectorAll('[data-unit-tab]')) as HTMLAnchorElement[];
+    const isDesktop = () => matchMedia('(min-width: 1040px)').matches;
+
+    const setActiveTab = (slug: string) => {
+      tabs.forEach((t) => t.classList.toggle('is-active', t.getAttribute('data-unit-tab') === slug));
+    };
+    // master-detail only on wide screens; on narrow, keep all visible (natural scroll)
+    const applyMode = () => {
+      if (isDesktop()) {
+        const slug = (location.hash || '#' + root.dataset.default).slice(1);
+        const active = details.some((d) => d.id === slug) ? slug : root.dataset.default!;
+        details.forEach((d) => (d.hidden = d.id !== active));
+        setActiveTab(active);
+      } else {
+        details.forEach((d) => (d.hidden = false));
+        setActiveTab((location.hash || '#' + root.dataset.default).slice(1));
+      }
+    };
+
+    tabs.forEach((t) =>
+      t.addEventListener('click', (e) => {
+        const slug = t.getAttribute('data-unit-tab')!;
+        if (isDesktop()) {
+          e.preventDefault();
+          history.replaceState(null, '', '#' + slug);
+          details.forEach((d) => (d.hidden = d.id !== slug));
+          setActiveTab(slug);
+          const el = document.getElementById(slug);
+          el?.focus({ preventScroll: true });
+        } else {
+          setActiveTab(slug);
+        }
+      })
+    );
+
+    window.addEventListener('hashchange', applyMode);
+    let t: number | undefined;
+    window.addEventListener('resize', () => { clearTimeout(t); t = window.setTimeout(applyMode, 150); });
+    applyMode();
+  }
+</script>

@@ -1,0 +1,159 @@
+---
+/* "الأشعة في الفراغ" — a small 3D moment for Book 2, Unit 1.
+   three.js is dynamically imported ONLY when this panel scrolls into view and
+   the device supports WebGL and the user has not requested reduced motion.
+   A static isometric SVG (drawn below) is the fallback for no-JS / no-WebGL /
+   reduced-motion, showing the same vectors u, v and their sum u+v. */
+---
+<figure class="vscene" data-vscene>
+  <div class="vscene__frame">
+    <canvas class="vscene__canvas" data-vscene-canvas aria-hidden="true"></canvas>
+    <svg class="vscene__fallback" data-vscene-fallback viewBox="0 0 320 300" role="img"
+      aria-label="ثلاثة محاور في الفراغ مع شعاعين ومجموعهما">
+      <!-- isometric axes -->
+      <g stroke="var(--ink)" stroke-width="1.4" opacity="0.5" stroke-linecap="round">
+        <line x1="150" y1="200" x2="150" y2="70" />
+        <line x1="150" y1="200" x2="40" y2="250" />
+        <line x1="150" y1="200" x2="290" y2="150" />
+      </g>
+      <!-- vector u, v (ink) and sum (accent), with parallelogram -->
+      <g stroke-linecap="round" fill="none">
+        <line x1="150" y1="200" x2="240" y2="160" stroke="var(--ink)" stroke-width="2.4" />
+        <line x1="150" y1="200" x2="120" y2="120" stroke="var(--ink)" stroke-width="2.4" />
+        <line x1="240" y1="160" x2="210" y2="80" stroke="var(--line-strong)" stroke-width="1.4" stroke-dasharray="3 4" />
+        <line x1="120" y1="120" x2="210" y2="80" stroke="var(--line-strong)" stroke-width="1.4" stroke-dasharray="3 4" />
+        <line x1="150" y1="200" x2="210" y2="80" stroke="var(--accent)" stroke-width="2.8" />
+      </g>
+      <g fill="var(--ink)"><circle cx="240" cy="160" r="3.5" /><circle cx="120" cy="120" r="3.5" /></g>
+      <circle cx="210" cy="80" r="4.5" fill="var(--accent)" />
+    </svg>
+  </div>
+  <figcaption class="vscene__cap">
+    <span>الأشعّة في الفراغ: <span class="vscene__accent">مجموع شعاعين</span> هو قطر متوازي الأضلاع.</span>
+    <span class="vscene__hint" data-vscene-hint hidden>اسحب لتدوير المشهد</span>
+  </figcaption>
+</figure>
+
+<style>
+  .vscene { display: grid; gap: var(--s-3); }
+  .vscene__frame { position: relative; aspect-ratio: 16 / 11; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
+  .vscene__canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; display: none; touch-action: none; cursor: grab; }
+  .vscene__canvas.is-live { display: block; }
+  .vscene__canvas:active { cursor: grabbing; }
+  .vscene__fallback { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  .vscene__frame.is-live .vscene__fallback { display: none; }
+  .vscene__cap { display: flex; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; color: var(--ink-2); font-size: var(--fs-small); }
+  .vscene__accent { color: var(--accent-ink); }
+  .vscene__hint { color: var(--ink-3); }
+</style>
+
+<script>
+  const root = document.querySelector('[data-vscene]');
+  if (root) {
+    const canvas = root.querySelector('[data-vscene-canvas]') as HTMLCanvasElement;
+    const frame = root.querySelector('.vscene__frame') as HTMLElement;
+    const hint = root.querySelector('[data-vscene-hint]') as HTMLElement;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasWebGL = (() => { try { return !!document.createElement('canvas').getContext('webgl'); } catch { return false; } })();
+
+    let started = false;
+    const io = new IntersectionObserver((entries, obs) => {
+      for (const e of entries) {
+        if (e.isIntersecting && !started && hasWebGL) {
+          started = true;
+          obs.disconnect();
+          mount().catch(() => { /* keep SVG fallback */ });
+        }
+      }
+    }, { threshold: 0.25 });
+    io.observe(root);
+
+    async function mount() {
+      const THREE = await import('three');
+      const INK = 0x17212a, ACCENT = 0xb23a2a, GRID = 0xc2ccd4, SOFT = 0xcbc6b6;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+      const target = new THREE.Vector3(1, 1, 1);
+
+      const root3 = new THREE.Group();
+      scene.add(root3);
+
+      // faint ground grid on the x-z plane
+      const grid = new THREE.GridHelper(8, 8, GRID, GRID);
+      (grid.material as any).opacity = 0.35; (grid.material as any).transparent = true;
+      grid.position.set(0, 0, 0);
+      root3.add(grid);
+
+      // axes (x,y,z) as thin ink lines
+      const axis = (a: [number, number, number], b: [number, number, number]) => {
+        const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
+        return new THREE.Line(g, new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.4 }));
+      };
+      root3.add(axis([0, 0, 0], [3.6, 0, 0]), axis([0, 0, 0], [0, 3.2, 0]), axis([0, 0, 0], [0, 0, 3.6]));
+
+      // vectors u, v (ink) and sum w=u+v (accent)
+      const O = new THREE.Vector3(0, 0, 0);
+      const u = new THREE.Vector3(2, 1, 0), v = new THREE.Vector3(0, 1, 2), w = u.clone().add(v);
+      const arrow = (vec: InstanceType<typeof THREE.Vector3>, color: number) =>
+        new THREE.ArrowHelper(vec.clone().normalize(), O, vec.length(), color, 0.42, 0.26);
+      root3.add(arrow(u, INK), arrow(v, INK), arrow(w, ACCENT));
+
+      // dashed parallelogram edges u->w and v->w
+      const dash = (a: InstanceType<typeof THREE.Vector3>, b: InstanceType<typeof THREE.Vector3>) => {
+        const g = new THREE.BufferGeometry().setFromPoints([a, b]);
+        const l = new THREE.Line(g, new THREE.LineDashedMaterial({ color: SOFT, dashSize: 0.18, gapSize: 0.14 }));
+        l.computeLineDistances();
+        return l;
+      };
+      root3.add(dash(u, w), dash(v, w));
+
+      // orbit state
+      let theta = 0.9, phi = 1.02, R = 6.1, dragging = false, px = 0, py = 0, needsRender = true;
+      const place = () => {
+        camera.position.set(
+          target.x + R * Math.sin(phi) * Math.cos(theta),
+          target.y + R * Math.cos(phi),
+          target.z + R * Math.sin(phi) * Math.sin(theta)
+        );
+        camera.lookAt(target);
+      };
+      const resize = () => {
+        const w2 = frame.clientWidth, h2 = frame.clientHeight;
+        renderer.setSize(w2, h2, false);
+        camera.aspect = w2 / h2; camera.updateProjectionMatrix();
+        needsRender = true;
+      };
+      new ResizeObserver(resize).observe(frame);
+      resize();
+
+      canvas.addEventListener('pointerdown', (e) => { dragging = true; px = e.clientX; py = e.clientY; canvas.setPointerCapture(e.pointerId); });
+      canvas.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        theta -= (e.clientX - px) * 0.008; px = e.clientX;
+        phi = Math.min(1.5, Math.max(0.35, phi - (e.clientY - py) * 0.006)); py = e.clientY;
+        needsRender = true;
+      });
+      const stop = () => (dragging = false);
+      canvas.addEventListener('pointerup', stop); canvas.addEventListener('pointercancel', stop);
+
+      let visible = true;
+      new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) needsRender = true; }, { threshold: 0 }).observe(frame);
+      document.addEventListener('visibilitychange', () => { visible = !document.hidden; if (visible) needsRender = true; });
+
+      canvas.classList.add('is-live'); frame.classList.add('is-live'); hint.hidden = false;
+
+      const loop = () => {
+        if (visible) {
+          if (!reduce && !dragging) { theta += 0.0026; needsRender = true; }
+          if (needsRender) { place(); renderer.render(scene, camera); needsRender = false; }
+        }
+        requestAnimationFrame(loop);
+      };
+      place();
+      loop();
+    }
+  }
+</script>

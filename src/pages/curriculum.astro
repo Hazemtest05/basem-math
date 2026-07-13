@@ -1,0 +1,38 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import CurriculumExplorer from '@/components/sections/CurriculumExplorer.astro';
+import VectorsScene from '@/components/sections/VectorsScene.astro';
+import { units, totalLessons } from '@/data/curriculum';
+---
+<Base page="/curriculum" title="المنهاج" description="خريطة تفاعلية لمنهاج رياضيات البكالوريا العلمية في سوريا: 14 وحدة عبر كتابين، مع أهم القوانين والمهارات والدروس لكل وحدة.">
+  <PageHero
+    eyebrow="خريطة المنهاج"
+    title="المنهاج كاملاً، كخريطةٍ لا كقائمة."
+    lead="اختر وحدةً من الفهرس لترى أهمّ قوانينها، وماذا ستتقن فيها، ودروسها. كل شيء مبني على منهاج البكالوريا العلمية.">
+    <p class="curriculum-stat"><span class="num">{units.length}</span> وحدة · <span class="num">{totalLessons}</span> درساً · كتابان</p>
+  </PageHero>
+
+  <section class="section spatial" style="padding-block-start:0">
+    <div class="wrap spatial__grid" data-reveal>
+      <div class="spatial__text">
+        <h2 class="h3 thin">الهندسة الفراغية ليست حفظاً، بل رؤية.</h2>
+        <p class="spatial__lead">في الكتاب الثاني ننتقل إلى ثلاثة أبعاد: أشعّة، ومستويات، وجداء سلّمي. المشهد المجاور تفاعلي، أدِرْه لترى كيف أنّ مجموع شعاعين هو ببساطة قطر متوازي الأضلاع الذي يحدّانه.</p>
+      </div>
+      <VectorsScene />
+    </div>
+  </section>
+
+  <section class="section" style="padding-block-start:0">
+    <div class="wrap">
+      <CurriculumExplorer />
+    </div>
+  </section>
+</Base>
+<style>
+  .curriculum-stat { margin-block-start: var(--s-5); color: var(--ink-2); font-size: var(--fs-small); }
+  .spatial { padding-block-end: clamp(2.5rem, 6vw, 5rem); }
+  .spatial__grid { display: grid; grid-template-columns: 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+  .spatial__lead { margin-block-start: var(--s-4); color: var(--ink-2); max-width: 46ch; line-height: 1.6; }
+  @media (min-width: 900px) { .spatial__grid { grid-template-columns: 0.85fr 1.15fr; } }
+</style>

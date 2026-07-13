@@ -1,0 +1,18 @@
+---
+/* Renders a LaTeX-subset string with the local texlite typesetter (build-time). */
+import { tex, texBlock, texToSpeech } from '@/lib/texlite';
+interface Props {
+  tex: string;
+  block?: boolean;
+  class?: string;
+  label?: string;
+}
+const { tex: src, block = false, class: cls = '', label } = Astro.props;
+const html = block ? texBlock(src) : tex(src);
+// never expose raw LaTeX to assistive tech: fall back to a spoken Arabic form
+const ariaLabel = label ?? texToSpeech(src);
+---
+<span class:list={['math-host', cls]} role="math" aria-label={ariaLabel} set:html={html} />
+<style>
+  .math-host { display: inline; }
+</style>

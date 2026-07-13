@@ -1,0 +1,208 @@
+---
+import { site } from '@/config/site';
+import { teacher } from '@/config/teacher';
+import Icon from '@/components/Icon.astro';
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero__grid">
+    <div class="hero__text">
+      <p class="hero__eyebrow">
+        <span class="hero__mark" aria-hidden="true"></span>
+        {teacher.title} · {teacher.level}
+      </p>
+      <h1 id="hero-title" class="hero__title">
+        الرياضيات <span class="hero__accent">أسهل</span> ممّا تتخيّل
+      </h1>
+      <p class="hero__lead">{site.sloganSecondary}</p>
+      <div class="hero__actions">
+        <a href="/curriculum" class="btn btn--accent">
+          استكشف المنهاج <Icon name="arrow" size={18} />
+        </a>
+        <a href="#tangent" class="btn btn--ghost">
+          <Icon name="play" size={16} /> شاهد مثالاً محلولاً
+        </a>
+      </div>
+    </div>
+
+    <figure class="hero__stage" data-hero-stage>
+      <figcaption class="visually-hidden">
+        رسم بياني تفاعلي: منحنٍ معقّد يتحوّل تدريجياً إلى منحنٍ بسيط أنيق.
+      </figcaption>
+      <svg class="hero__svg" viewBox="0 0 520 420" role="img" aria-label="منحنٍ رياضي يتبسّط">
+        <defs>
+          <clipPath id="heroClip"><rect x="40" y="24" width="452" height="352" rx="8" /></clipPath>
+        </defs>
+        <!-- grid -->
+        <g stroke="var(--grid)" stroke-width="1" clip-path="url(#heroClip)">
+          {Array.from({ length: 11 }).map((_, i) => (
+            <line x1={40 + i * 45.2} y1="24" x2={40 + i * 45.2} y2="376" />
+          ))}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <line x1="40" y1={24 + i * 50.3} x2="492" y2={24 + i * 50.3} />
+          ))}
+        </g>
+        <!-- axes -->
+        <g stroke="var(--grid-major)" stroke-width="1.4">
+          <line x1="40" y1="200" x2="492" y2="200" />
+          <line x1="266" y1="24" x2="266" y2="376" />
+        </g>
+        <!-- morphing curve -->
+        <path data-hero-curve d="" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" clip-path="url(#heroClip)" />
+        <circle data-hero-dot r="6" fill="var(--accent)" />
+      </svg>
+
+      <div class="hero__scrub">
+        <label for="hero-range" class="hero__scrub-label">
+          <span data-hero-caption>معقّد</span>
+          <span class="hero__scrub-hint">اسحب لتبسّطه</span>
+        </label>
+        <input id="hero-range" type="range" min="0" max="100" value="100" data-hero-range aria-label="من المعقّد إلى البسيط" />
+      </div>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; z-index: var(--z-content); padding-block: clamp(2rem, 5vw, 4.5rem) clamp(3rem, 7vw, 6rem); }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    min-height: min(72dvh, 640px);
+  }
+  .hero__eyebrow { display: inline-flex; align-items: center; gap: var(--s-3); color: var(--ink-2); font-size: var(--fs-body); margin-block-end: var(--s-5); }
+  .hero__mark { inline-size: 2rem; block-size: 2px; background: var(--accent); display: inline-block; }
+  .hero__title {
+    font-size: clamp(2.7rem, 1.6rem + 5vw, 5.2rem);
+    font-weight: var(--w-thin);
+    letter-spacing: -0.01em;
+    line-height: 1.14;
+  }
+  .hero__accent {
+    font-weight: var(--w-reg);
+    color: var(--accent-ink);
+    white-space: nowrap;
+    /* underline flows within the word's own line box, never overlaps the next line */
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-position: 0 92%;
+    background-size: 0% 0.08em;
+    animation: heroUnderline 0.7s var(--ease) 0.6s forwards;
+  }
+  @keyframes heroUnderline { to { background-size: 100% 0.08em; } }
+  @media (prefers-reduced-motion: reduce) { .hero__accent { background-size: 100% 0.08em; animation: none; } }
+  .hero__lead { margin-block-start: var(--s-5); font-size: var(--fs-lead); color: var(--ink-2); max-width: 44ch; line-height: 1.5; }
+  .hero__actions { margin-block-start: var(--s-6); display: flex; flex-wrap: wrap; gap: var(--s-3); }
+
+  .hero__stage { position: relative; }
+  .hero__svg {
+    width: 100%;
+    height: auto;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-2);
+  }
+  .hero__scrub { margin-block-start: var(--s-4); display: grid; gap: var(--s-2); }
+  .hero__scrub-label { display: flex; align-items: baseline; justify-content: space-between; font-size: var(--fs-small); color: var(--ink-2); }
+  .hero__scrub-label [data-hero-caption] { color: var(--accent-ink); }
+  .hero__scrub-hint { color: var(--ink-3); }
+  input[type='range'][data-hero-range] {
+    inline-size: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    block-size: 36px;
+    background: transparent;
+    outline-offset: 6px;
+    cursor: pointer;
+  }
+  input[type='range'][data-hero-range]::-webkit-slider-runnable-track {
+    block-size: 4px; border-radius: var(--r-pill);
+    background: linear-gradient(90deg, var(--accent) 0 var(--fill, 100%), var(--line-strong) var(--fill, 100%));
+  }
+  input[type='range'][data-hero-range]::-moz-range-track {
+    block-size: 4px; border-radius: var(--r-pill);
+    background: linear-gradient(90deg, var(--accent) 0 var(--fill, 100%), var(--line-strong) var(--fill, 100%));
+  }
+  input[type='range'][data-hero-range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; margin-top: -8px;
+    inline-size: 20px; block-size: 20px; border-radius: 50%;
+    background: var(--paper); border: 2.5px solid var(--accent); box-shadow: var(--sh-1); cursor: grab;
+  }
+  input[type='range'][data-hero-range]::-moz-range-thumb {
+    inline-size: 20px; block-size: 20px; border-radius: 50%;
+    background: var(--paper); border: 2.5px solid var(--accent); cursor: grab;
+  }
+  .visually-hidden, .hero__stage figcaption {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  @media (min-width: 940px) {
+    .hero__grid { grid-template-columns: 1.05fr 0.95fr; }
+  }
+</style>
+
+<script>
+  const stage = document.querySelector('[data-hero-stage]');
+  if (stage) {
+    const curve = stage.querySelector('[data-hero-curve]') as SVGPathElement;
+    const dot = stage.querySelector('[data-hero-dot]') as SVGCircleElement;
+    const range = stage.querySelector('[data-hero-range]') as HTMLInputElement;
+    const caption = stage.querySelector('[data-hero-caption]') as HTMLElement;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const X0 = 40, X1 = 492, Y0 = 200, span = 150; // svg mapping
+    const N = 90;
+    // complex + simple sample arrays over x in [-6,6]
+    const complexY: number[] = [];
+    const simpleY: number[] = [];
+    for (let i = 0; i <= N; i++) {
+      const x = -6 + (12 * i) / N;
+      complexY.push(0.55 * Math.sin(1.4 * x) + 0.42 * Math.sin(3.1 * x + 0.8) + 0.22 * Math.sin(6.2 * x));
+      simpleY.push(0.9 * Math.tanh(0.62 * x));
+    }
+    const build = (t: number) => {
+      let d = '';
+      let dotX = X0, dotY = Y0;
+      for (let i = 0; i <= N; i++) {
+        const yv = complexY[i] * (1 - t) + simpleY[i] * t;
+        const px = X0 + ((X1 - X0) * i) / N;
+        const py = Y0 - yv * span;
+        d += (i === 0 ? 'M' : 'L') + px.toFixed(1) + ' ' + py.toFixed(1) + ' ';
+        if (i === N) { dotX = px; dotY = py; }
+      }
+      curve.setAttribute('d', d.trim());
+      dot.setAttribute('cx', dotX.toFixed(1));
+      dot.setAttribute('cy', dotY.toFixed(1));
+    };
+    const setCaption = (t: number) => {
+      caption.textContent = t > 0.72 ? 'فكرة واحدة' : t > 0.34 ? 'يتّضح…' : 'معقّد';
+      range.style.setProperty('--fill', (t * 100).toFixed(0) + '%');
+    };
+    const apply = (t: number) => { build(t); setCaption(t); };
+
+    range.addEventListener('input', () => apply(+range.value / 100));
+
+    if (reduce) {
+      range.value = '100';
+      apply(1);
+    } else {
+      // intro: complex resolves to simple once, then rests
+      let start: number | null = null;
+      const DUR = 1500;
+      const ease = (u: number) => 1 - Math.pow(1 - u, 3);
+      const step = (ts: number) => {
+        if (start === null) start = ts;
+        const u = Math.min(1, (ts - start) / DUR);
+        const t = ease(u);
+        range.value = String(Math.round(t * 100));
+        apply(t);
+        if (u < 1) requestAnimationFrame(step);
+      };
+      apply(0);
+      requestAnimationFrame(step);
+    }
+  }
+</script>

@@ -1,0 +1,408 @@
+@import './fonts.css';
+
+/* =========================================================================
+   DESIGN TOKENS
+   Theme: single light "engineering-paper + ink" notebook theme (locked).
+   Accent (locked, one): a warm vermillion "teacher's correction pen".
+   Faint blue graph lines are the paper SUBSTRATE, not a second accent.
+   ========================================================================= */
+:root {
+  /* --- surfaces --- */
+  --paper: #f3f1ea;          /* main notebook paper */
+  --paper-2: #eeece3;        /* recessed / alt band */
+  --raised: #fbfaf5;         /* cards, raised surfaces */
+  --board: #1c2a27;          /* chalkboard green-ink (footer / final band only) */
+  --board-2: #24332f;
+
+  /* --- ink (text) --- */
+  --ink: #17212a;            /* primary text (AAA on paper) */
+  --ink-2: #4c5a63;          /* secondary text (AA on paper) */
+  --ink-3: #5f6c76;          /* muted tertiary text; AA on paper (~4.7:1) */
+  --chalk: #eef2ea;          /* text on board */
+  --chalk-2: #a7b7ac;        /* secondary text on board */
+
+  /* --- lines --- */
+  --line: #dcd8cc;           /* hairlines on paper */
+  --line-strong: #cbc6b6;
+  --grid: rgba(42, 88, 122, 0.10);       /* graph quadrillage (minor) */
+  --grid-major: rgba(42, 88, 122, 0.16); /* graph quadrillage (major) */
+
+  /* --- accent: the red pen (locked, single accent) --- */
+  --accent: #b23a2a;         /* CTA fill; white text passes AA (>5:1) */
+  --accent-bright: #d8492f;  /* large hand-drawn strokes / decoration only */
+  --accent-ink: #8f2c20;     /* accent-colored TEXT on paper (high contrast) */
+  --accent-wash: rgba(178, 58, 42, 0.08);
+  --accent-wash-2: rgba(178, 58, 42, 0.14);
+
+  /* --- semantic (used sparingly, mirrors the guide's alert types) --- */
+  --ok: #2f6b4f;             /* "correct" / verification green */
+  --ok-wash: rgba(47, 107, 79, 0.10);
+
+  /* --- type --- */
+  --font: 'Madika', 'Segoe UI', system-ui, sans-serif;
+  --w-thin: 100;
+  --w-reg: 400;
+
+  /* fluid type scale (min .. max), RTL-safe */
+  --fs-display: clamp(2.9rem, 1.6rem + 6.2vw, 6.5rem);
+  --fs-h1: clamp(2.2rem, 1.4rem + 3.6vw, 4rem);
+  --fs-h2: clamp(1.7rem, 1.25rem + 2.1vw, 2.9rem);
+  --fs-h3: clamp(1.28rem, 1.05rem + 1.05vw, 1.7rem);
+  --fs-lead: clamp(1.1rem, 1rem + 0.5vw, 1.4rem);
+  --fs-body: clamp(1rem, 0.96rem + 0.2vw, 1.12rem);
+  --fs-small: 0.875rem;
+  --fs-micro: 0.75rem;
+
+  --lh-tight: 1.06;
+  --lh-snug: 1.28;
+  --lh-body: 1.72;
+
+  /* --- spacing (8pt) --- */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+  --s-10: 8rem;
+  --s-11: 10rem;
+
+  /* --- radii (documented rule) ---
+     interactive controls: 10px · containers: 14px · tags/pills: full */
+  --r-control: 10px;
+  --r-card: 14px;
+  --r-pill: 999px;
+
+  /* --- elevation (tinted to paper, never pure black) --- */
+  --sh-1: 0 1px 2px rgba(28, 34, 26, 0.05);
+  --sh-2: 0 8px 24px -12px rgba(28, 34, 26, 0.18);
+  --sh-3: 0 24px 60px -24px rgba(28, 34, 26, 0.28);
+
+  /* --- motion --- */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 150ms;
+  --dur-2: 280ms;
+  --dur-3: 520ms;
+
+  /* --- layout --- */
+  --maxw: 1240px;
+  --maxw-text: 68ch;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+
+  /* --- z --- */
+  --z-grid: 0;
+  --z-content: 1;
+  --z-nav: 60;
+  --z-loader: 90;
+  --z-modal: 80;
+}
+
+/* =========================================================================
+   RESET
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+html:focus-within { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font);
+  font-weight: var(--w-reg);
+  font-synthesis: none;             /* never fake a bold master */
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img, svg, video, canvas { display: block; max-width: 100%; }
+svg { height: auto; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: none; }
+a { color: inherit; text-decoration: none; }
+ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
+:where(h1, h2, h3, h4) { line-height: var(--lh-tight); font-weight: var(--w-reg); text-wrap: balance; }
+p { text-wrap: pretty; }
+
+/* Numbers/latin fragments inside Arabic keep tabular rhythm and LTR flow */
+.num, .ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================================
+   FOCUS (keyboard) — visible, on-brand, never removed
+   ========================================================================= */
+:focus-visible {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.skip-link {
+  position: fixed;
+  inset-inline-start: var(--s-4);
+  inset-block-start: -100%;
+  z-index: 200;
+  background: var(--ink);
+  color: var(--chalk);
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-control);
+  transition: inset-block-start var(--dur-2) var(--ease);
+}
+.skip-link:focus { inset-block-start: var(--s-4); }
+
+/* =========================================================================
+   GRAPH-PAPER SUBSTRATE
+   Fixed, non-scrolling, pointer-events:none. Cheap (two layered gradients).
+   ========================================================================= */
+.graph-bg {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grid);
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px);
+  background-size:
+    28px 28px, 28px 28px,   /* minor */
+    140px 140px, 140px 140px; /* major (every 5) */
+  /* fade the grid toward the edges so it reads as paper, not a table */
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 0%, #000 55%, transparent 100%);
+          mask-image: radial-gradient(120% 100% at 50% 0%, #000 55%, transparent 100%);
+  opacity: 0.9;
+}
+
+/* =========================================================================
+   LAYOUT HELPERS
+   ========================================================================= */
+.wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.section { position: relative; z-index: var(--z-content); padding-block: clamp(3.5rem, 8vw, 8rem); }
+.stack > * + * { margin-block-start: var(--flow, var(--s-5)); }
+.measure { max-width: var(--maxw-text); }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-small);
+  color: var(--accent-ink);
+  letter-spacing: 0.02em;
+}
+.eyebrow::before {
+  content: '';
+  inline-size: 1.6rem;
+  block-size: 1px;
+  background: var(--accent);
+}
+
+/* =========================================================================
+   TYPE UTILITIES
+   ========================================================================= */
+.display { font-size: var(--fs-display); font-weight: var(--w-thin); letter-spacing: -0.01em; }
+.h1 { font-size: var(--fs-h1); }
+.h2 { font-size: var(--fs-h2); }
+.h3 { font-size: var(--fs-h3); }
+.lead { font-size: var(--fs-lead); line-height: var(--lh-snug); color: var(--ink-2); }
+.thin { font-weight: var(--w-thin); }
+.muted { color: var(--ink-2); }
+.accent-text { color: var(--accent-ink); }
+
+/* =========================================================================
+   BUTTONS
+   ========================================================================= */
+.btn {
+  --btn-bg: var(--ink);
+  --btn-fg: var(--chalk);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  padding: 0.72em 1.35em;
+  border-radius: var(--r-control);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid transparent;
+  font-size: var(--fs-body);
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+  box-shadow: var(--sh-1);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: var(--sh-2); }
+.btn:active { transform: translateY(0); }
+.btn--accent { --btn-bg: var(--accent); --btn-fg: #fff; }
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+.btn--ghost:hover { background: var(--raised); border-color: var(--ink); }
+.btn--board { --btn-bg: var(--chalk); --btn-fg: var(--board); }
+
+.link-underline {
+  color: var(--accent-ink);
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-block-end: 2px;
+  transition: background-size var(--dur-2) var(--ease);
+}
+.link-underline:hover { background-size: 0% 1px; background-position: 100% 100%; }
+
+/* =========================================================================
+   TAGS / PILLS
+   ========================================================================= */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 0.3em 0.8em;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  background: var(--raised);
+}
+
+/* =========================================================================
+   SCROLL-REVEAL (CSS-only, IntersectionObserver toggles [data-inview])
+   ========================================================================= */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity var(--dur-3) var(--ease), transform var(--dur-3) var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal][data-inview] { opacity: 1; transform: none; }
+
+/* =========================================================================
+   REDUCED MOTION — collapse everything to static/instant
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] { opacity: 1; transform: none; }
+  .btn:hover { transform: none; }
+}
+
+/* =========================================================================
+   INTERACTIVE DEMOS (styles are global: controls are created in JS)
+   ========================================================================= */
+.demo {
+  margin-block: var(--s-5);
+  padding: var(--s-5);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+}
+.demo__head { margin-block-end: var(--s-4); }
+.demo__badge {
+  display: inline-block;
+  font-size: var(--fs-micro);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent-wash-2);
+  background: var(--accent-wash);
+  padding: 0.2em 0.7em;
+  border-radius: var(--r-pill);
+  margin-block-end: var(--s-3);
+}
+.demo__title { font-size: var(--fs-h3); }
+.demo__prompt { margin-block-start: var(--s-2); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.6; max-width: 52ch; }
+
+.demo__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-5); align-items: start; }
+.demo__stage svg {
+  inline-size: 100%; block-size: auto; display: block;
+  background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-control);
+}
+.demo__side { display: grid; gap: var(--s-4); align-content: start; }
+.demo__controls { display: grid; gap: var(--s-4); }
+.demo__readout {
+  color: var(--ink); font-size: var(--fs-small); line-height: 1.65;
+  padding: var(--s-3) var(--s-4); background: var(--raised);
+  border: 1px solid var(--line); border-radius: var(--r-control); min-block-size: 3.4em;
+  unicode-bidi: plaintext;
+}
+.demo__hint { color: var(--ink-3); font-size: var(--fs-small); }
+
+.demo__ctl { display: grid; gap: var(--s-2); }
+.demo__ctl-row { display: flex; justify-content: space-between; gap: var(--s-3); font-size: var(--fs-small); color: var(--ink-2); }
+.demo__ctl-val { color: var(--accent-ink); }
+/* range: a tall (touch-friendly) hit area with a thin visible track drawn by the
+   vendor track pseudo-elements. 4px bar centered inside a 34px grab zone. */
+.demo input[type='range'] {
+  inline-size: 100%; appearance: none; -webkit-appearance: none;
+  block-size: 34px; background: transparent; outline-offset: 6px; direction: ltr; cursor: pointer;
+}
+.demo input[type='range']::-webkit-slider-runnable-track { block-size: 4px; border-radius: var(--r-pill); background: var(--line-strong); }
+.demo input[type='range']::-moz-range-track { block-size: 4px; border-radius: var(--r-pill); background: var(--line-strong); }
+.demo input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; margin-top: -7px;
+  inline-size: 18px; block-size: 18px; border-radius: 50%;
+  background: var(--paper); border: 2.5px solid var(--accent); cursor: grab;
+}
+.demo input[type='range']::-moz-range-thumb {
+  inline-size: 18px; block-size: 18px; border-radius: 50%;
+  background: var(--paper); border: 2.5px solid var(--accent); cursor: grab;
+}
+.demo__seg { display: inline-flex; gap: var(--s-1); padding: var(--s-1); background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-pill); }
+.demo__seg-btn { padding: 0.45em 1em; border-radius: var(--r-pill); font-size: var(--fs-small); color: var(--ink-2); transition: background var(--dur-1) var(--ease), color var(--dur-1), transform var(--dur-1) var(--ease); }
+.demo__seg-btn.is-on { background: var(--ink); color: var(--chalk); }
+.demo__btn {
+  justify-self: start; padding: 0.55em 1.05em; border-radius: var(--r-control);
+  border: 1px solid var(--line-strong); background: var(--raised); color: var(--ink); font-size: var(--fs-small);
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1), transform var(--dur-1) var(--ease);
+}
+.demo__btn:hover { background: var(--paper); border-color: var(--accent); color: var(--accent-ink); }
+.demo__btn:active, .demo__seg-btn:active { transform: scale(0.96); }
+
+/* moving parts glide instead of snapping when a slider changes (never during a
+   drag: draggable handles aren't marked .glide). Off under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-demo] .glide {
+    transition: cx var(--dur-1) var(--ease), cy var(--dur-1) var(--ease),
+      x1 var(--dur-1) var(--ease), y1 var(--dur-1) var(--ease),
+      x2 var(--dur-1) var(--ease), y2 var(--dur-1) var(--ease);
+  }
+}
+
+@media (min-width: 620px) {
+  .demo__grid { grid-template-columns: 1.15fr 0.85fr; }
+}
+/* coarse pointers (touch): guarantee comfortable tap targets on demo controls */
+@media (pointer: coarse) {
+  .demo__seg-btn { padding-block: 0.6em; }
+  .demo__btn { padding-block: 0.72em; }
+}
+
+/* =========================================================================
+   PRINT — flatten to clean paper
+   ========================================================================= */
+@media print {
+  .graph-bg, .site-nav, .loader, .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+}

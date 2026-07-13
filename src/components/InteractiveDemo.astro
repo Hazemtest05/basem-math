@@ -1,0 +1,32 @@
+---
+/* One interactive explorer. Renders an empty SVG stage + controls slot that the
+   interactives engine (src/lib/interactives.ts) populates on load. Styles for
+   the JS-created controls live in global.css (they must be global). */
+import type { DemoConfig } from '@/data/interactiveDemos';
+interface Props extends DemoConfig {}
+const { type, title, prompt } = Astro.props;
+---
+<div class="demo" data-demo={type}>
+  <div class="demo__head">
+    <span class="demo__badge">جرّب بنفسك</span>
+    <h4 class="demo__title">{title}</h4>
+    <p class="demo__prompt">{prompt}</p>
+  </div>
+  <div class="demo__grid">
+    <div class="demo__stage">
+      <svg data-demo-svg viewBox="0 0 360 258" role="img" aria-label={title}></svg>
+    </div>
+    <div class="demo__side">
+      <div class="demo__controls" data-demo-controls></div>
+      <p class="demo__readout" data-demo-readout></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initInteractives } from '@/lib/interactives';
+  const run = () => initInteractives();
+  if (document.readyState !== 'loading') run();
+  else document.addEventListener('DOMContentLoaded', run);
+  document.addEventListener('astro:page-load', run);
+</script>

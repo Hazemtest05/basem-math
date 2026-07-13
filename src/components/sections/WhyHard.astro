@@ -1,0 +1,76 @@
+---
+import { reasons, whyHardIntro } from '@/data/whyHard';
+import Icon from '@/components/Icon.astro';
+---
+<section class="why section" aria-labelledby="why-title">
+  <div class="wrap">
+    <header class="why__head" data-reveal>
+      <h2 id="why-title" class="h2 thin why__title">{whyHardIntro.title}</h2>
+      <p class="lead measure">{whyHardIntro.lead}</p>
+    </header>
+
+    <ol class="why__list" role="list">
+      {reasons.map((r, i) => (
+        <li class="why__row" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+          <span class="why__n thin" aria-hidden="true">{r.n}</span>
+          <div class="why__body">
+            <h3 class="why__problem">{r.problem}</h3>
+            <p class="why__quip">{r.quip}</p>
+            <p class="why__fix">
+              <span class="why__fix-tag"><Icon name="check" size={16} /> الطريقة</span>
+              {r.fix}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .why__head { max-width: 46ch; margin-block-end: var(--s-8); }
+  .why__title { margin-block: var(--s-3) var(--s-4); }
+
+  .why__list { display: grid; }
+  .why__row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-4) var(--s-5);
+    padding-block: var(--s-6);
+    border-block-start: 1px solid var(--line);
+    align-items: start;
+  }
+  .why__row:last-child { border-block-end: 1px solid var(--line); }
+  .why__n { font-size: clamp(2rem, 4vw, 3.2rem); color: var(--ink-3); line-height: 1; font-variant-numeric: tabular-nums; }
+  .why__problem { font-size: var(--fs-h3); color: var(--ink); max-width: 30ch; }
+  .why__quip {
+    margin-block-start: var(--s-3);
+    color: var(--accent-ink);
+    max-width: 52ch;
+    font-size: var(--fs-body);
+  }
+  .why__quip::before {
+    content: '';
+    display: inline-block;
+    inline-size: 1.4rem;
+    block-size: 2px;
+    background: var(--accent);
+    vertical-align: middle;
+    margin-inline-end: 0.55rem;
+    transform: translateY(-0.15em);
+  }
+  .why__fix { margin-block-start: var(--s-4); color: var(--ink-2); max-width: 56ch; }
+  .why__fix-tag {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    color: var(--ink); margin-inline-end: var(--s-2);
+  }
+  .why__fix-tag :global(.icon) { color: var(--ok); }
+
+  @media (min-width: 760px) {
+    .why__row { grid-template-columns: 5rem 1fr; gap: var(--s-6) var(--s-8); }
+    .why__body { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--s-4) var(--s-7); align-items: start; }
+    .why__problem { grid-column: 1; }
+    .why__quip { grid-column: 1; margin-block-start: var(--s-2); }
+    .why__fix { grid-column: 2; grid-row: 1 / span 2; margin-block-start: 0; align-self: center; }
+  }
+</style>

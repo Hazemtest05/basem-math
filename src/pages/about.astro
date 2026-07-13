@@ -1,0 +1,79 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import { teacher, whatsappLink } from '@/config/teacher';
+---
+<Base page="/about" title="عن الأستاذ" description={teacher.bio}>
+  <PageHero eyebrow="عن الأستاذ" title={`${teacher.name}`} lead={teacher.bio} />
+
+  <section class="section about" style="padding-block-start:0">
+    <div class="wrap about__grid">
+      <aside class="about__card" data-reveal>
+        {teacher.photo ? (
+          <img class="about__photo" src={teacher.photo} alt={teacher.name} width="360" height="440" decoding="async" />
+        ) : (
+          <div class="about__portrait" role="img" aria-label="مكان صورة الأستاذ">
+            <svg viewBox="0 0 200 240" fill="none" aria-hidden="true">
+              <rect width="200" height="240" rx="12" fill="var(--paper-2)" />
+              <g stroke="var(--grid-major)" stroke-width="1">
+                {Array.from({ length: 9 }).map((_, i) => (<line x1={i * 25} y1="0" x2={i * 25} y2="240" />))}
+                {Array.from({ length: 11 }).map((_, i) => (<line x1="0" y1={i * 25} x2="200" y2={i * 25} />))}
+              </g>
+              <path d="M20 190 C 70 190, 80 70, 110 70 C 150 70, 150 150, 185 150" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" />
+              <circle cx="110" cy="70" r="5" fill="var(--accent)" />
+            </svg>
+            <p class="about__portrait-note">أضف صورةً حقيقية في <code>teacher.photo</code></p>
+          </div>
+        )}
+        <ul class="about__facts" role="list">
+          <li><span>المادة</span><strong>{teacher.title}</strong></li>
+          <li><span>المرحلة</span><strong>{teacher.level}</strong></li>
+          <li><span>المكان</span><strong>{teacher.city}، {teacher.country}</strong></li>
+        </ul>
+        <a href={whatsappLink('مرحباً أستاذ، حابب أعرف أكتر عن الدروس.')} class="btn btn--accent about__cta" target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={18} /> تواصل معي
+        </a>
+      </aside>
+
+      <div class="about__body">
+        <div class="about__bio" data-reveal>
+          {teacher.bioLong.map((p) => (<p>{p}</p>))}
+        </div>
+
+        <section class="about__creds" data-reveal aria-labelledby="creds-h">
+          <h2 id="creds-h" class="h3 thin">المؤهّلات</h2>
+          <ul role="list">
+            {teacher.credentials.map((c) => (<li><Icon name="check" size={18} /> {c}</li>))}
+          </ul>
+          <p class="about__creds-note">هذه الحقول قابلة للتعديل في <code>src/config/teacher.ts</code> قبل النشر.</p>
+        </section>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about__grid { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3.5rem); align-items: start; }
+  .about__card { display: grid; gap: var(--s-5); }
+  .about__photo, .about__portrait { width: 100%; border-radius: var(--r-card); border: 1px solid var(--line); }
+  .about__portrait { position: relative; overflow: hidden; background: var(--paper-2); }
+  .about__portrait svg { width: 100%; height: auto; display: block; }
+  .about__portrait-note { position: absolute; inset-block-end: var(--s-3); inset-inline: var(--s-3); text-align: center; font-size: var(--fs-micro); color: var(--ink-3); }
+  .about__portrait-note code { color: var(--accent-ink); }
+  .about__facts { display: grid; gap: var(--s-3); }
+  .about__facts li { display: flex; justify-content: space-between; gap: var(--s-3); padding-block: var(--s-2); border-block-end: 1px solid var(--line); color: var(--ink-2); font-size: var(--fs-small); }
+  .about__facts strong { color: var(--ink); font-weight: var(--w-reg); }
+  .about__cta { justify-content: center; }
+
+  .about__bio { display: grid; gap: var(--s-4); font-size: var(--fs-lead); color: var(--ink-2); line-height: 1.7; }
+  .about__bio p:first-child { color: var(--ink); }
+  .about__creds { margin-block-start: var(--s-8); padding-block-start: var(--s-6); border-block-start: 1px solid var(--line); }
+  .about__creds ul { display: grid; gap: var(--s-3); margin-block-start: var(--s-4); }
+  .about__creds li { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); color: var(--ink); }
+  .about__creds :global(.icon) { color: var(--ok); }
+  .about__creds-note { margin-block-start: var(--s-5); font-size: var(--fs-micro); color: var(--ink-3); }
+  .about__creds-note code { color: var(--accent-ink); }
+
+  @media (min-width: 900px) { .about__grid { grid-template-columns: 340px 1fr; gap: var(--s-9); } }
+</style>

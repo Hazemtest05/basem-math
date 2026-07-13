@@ -1,0 +1,40 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import InteractiveTangent from '@/components/sections/InteractiveTangent.astro';
+import SelectedProblems from '@/components/sections/SelectedProblems.astro';
+import Icon from '@/components/Icon.astro';
+import { whatsappLink } from '@/config/teacher';
+---
+<Base page="/lessons" title="الدروس" description="دروس تفاعلية وأمثلة محلولة من منهاج البكالوريا العلمية: من الوتر إلى المماس، الشكل المثلّثي، وحساب المساحات.">
+  <PageHero
+    eyebrow="الدروس والمصادر"
+    title="افهمها بيدك، لا بعينك فقط."
+    lead="درسٌ تفاعلي كامل، وأمثلة محلولة بالخطوات. جرّب، اسحب، وأجب، ثم قارن بالحل." />
+
+  <InteractiveTangent />
+  <SelectedProblems />
+
+  <section class="section resources">
+    <div class="wrap">
+      <div class="resources__box" data-reveal>
+        <div>
+          <h2 class="h3">تريد الدرس كاملاً بصوت الأستاذ؟</h2>
+          <p class="resources__note">الملخّصات والأوراق التدريبية القابلة للتحميل ستُضاف هنا قريباً. حتى ذلك الحين، أرسل درساً محدّداً وسأشرحه لك.</p>
+        </div>
+        <a href={whatsappLink('أستاذ، بدّي شرح لدرس معيّن.')} class="btn btn--accent" target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={18} /> اطلب شرح درس
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .resources__box {
+    display: grid; gap: var(--s-5); align-items: center;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-card);
+  }
+  .resources__note { margin-block-start: var(--s-3); color: var(--ink-2); max-width: 56ch; }
+  @media (min-width: 760px) { .resources__box { grid-template-columns: 1fr auto; } }
+</style>

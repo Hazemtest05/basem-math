@@ -1,0 +1,17 @@
+---
+interface Props { eyebrow?: string; title: string; lead?: string; }
+const { eyebrow, title, lead } = Astro.props;
+---
+<header class="pagehero">
+  <div class="wrap">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1 class="pagehero__title thin">{title}</h1>
+    {lead && <p class="lead measure pagehero__lead"><slot name="lead">{lead}</slot></p>}
+    <slot />
+  </div>
+</header>
+<style>
+  .pagehero { position: relative; z-index: var(--z-content); padding-block: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 3vw, 2.5rem); }
+  .pagehero__title { font-size: var(--fs-h1); margin-block-start: var(--s-3); }
+  .pagehero__lead { margin-block-start: var(--s-4); }
+</style>

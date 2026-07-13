@@ -1,0 +1,48 @@
+---
+import Base from '@/layouts/Base.astro';
+import Icon from '@/components/Icon.astro';
+---
+<Base page="/404" title="صفحة غير موجودة">
+  <section class="section notfound">
+    <div class="wrap notfound__grid">
+      <div class="notfound__text">
+        <p class="eyebrow">خطأ في المجال</p>
+        <h1 class="notfound__code thin"><span class="num">404</span></h1>
+        <p class="notfound__lead">هذه النقطة غير معرّفة في مجال هذا الموقع. حتى أجمل التوابع لها نقاط لا تصلها.</p>
+        <p class="notfound__quip">لا بأس، النهاية موجودة حتى لو النقطة مفقودة. لنعُد إلى حيث المنحني متّصل.</p>
+        <div class="notfound__actions">
+          <a href="/" class="btn btn--accent"><Icon name="arrow" size={16} /> العودة إلى البداية</a>
+          <a href="/curriculum" class="btn btn--ghost">تصفّح المنهاج</a>
+        </div>
+      </div>
+
+      <figure class="notfound__fig" aria-hidden="true">
+        <svg viewBox="0 0 320 280" fill="none">
+          <g stroke="var(--grid)" stroke-width="1">
+            {Array.from({ length: 8 }).map((_, i) => (<line x1={i * 45 + 10} y1="10" x2={i * 45 + 10} y2="250" />))}
+            {Array.from({ length: 6 }).map((_, i) => (<line x1="10" y1={i * 45 + 15} x2="316" y2={i * 45 + 15} />))}
+          </g>
+          <g stroke="var(--grid-major)" stroke-width="1.4">
+            <line x1="10" y1="150" x2="316" y2="150" /><line x1="55" y1="10" x2="55" y2="250" />
+          </g>
+          <!-- curve with a removable discontinuity at the middle -->
+          <path d="M20 210 C 80 210, 110 70, 150 70" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" />
+          <path d="M172 70 C 210 70, 250 210, 300 210" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" />
+          <circle cx="161" cy="70" r="7" fill="var(--paper)" stroke="var(--accent)" stroke-width="2.6" />
+          <text x="161" y="52" text-anchor="middle" fill="var(--accent-ink)" font-size="15">?</text>
+        </svg>
+      </figure>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound { min-height: 62dvh; display: grid; align-items: center; }
+  .notfound__grid { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+  .notfound__code { font-size: clamp(4rem, 3rem + 12vw, 10rem); line-height: 1; color: var(--ink); }
+  .notfound__lead { margin-block-start: var(--s-4); font-size: var(--fs-lead); color: var(--ink-2); max-width: 46ch; }
+  .notfound__quip { margin-block-start: var(--s-3); color: var(--accent-ink); max-width: 46ch; }
+  .notfound__actions { margin-block-start: var(--s-6); display: flex; gap: var(--s-3); flex-wrap: wrap; }
+  .notfound__fig svg { width: 100%; height: auto; max-width: 460px; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card); }
+  @media (min-width: 860px) { .notfound__grid { grid-template-columns: 1.1fr 0.9fr; } }
+</style>

@@ -1,0 +1,121 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import { teacher, whatsappLink } from '@/config/teacher';
+---
+<Base page="/contact" title="تواصل" description="تواصل مع الأستاذ عبر واتساب أو البريد. أرسل مسألةً تُحيّرك واحصل على طريقة حلّها.">
+  <PageHero
+    eyebrow="تواصل"
+    title="أرسل مسألةً واحدة. لنبدأ من هناك."
+    lead="لا نموذج طويل ولا وعود. اكتب سؤالك أو المسألة التي تُحيّرك، وسأردّ بطريقة الحل." />
+
+  <section class="section contact" style="padding-block-start:0">
+    <div class="wrap contact__grid">
+      <form class="contact__form" data-contact-form data-reveal>
+        <div class="field">
+          <label for="c-name">الاسم</label>
+          <input id="c-name" name="name" type="text" autocomplete="name" required placeholder="اسمك" />
+        </div>
+        <div class="field">
+          <label for="c-grade">الصف أو المستوى <span class="field__opt">(اختياري)</span></label>
+          <input id="c-grade" name="grade" type="text" placeholder="مثال: الثالث الثانوي العلمي" />
+        </div>
+        <div class="field">
+          <label for="c-msg">المسألة أو السؤال</label>
+          <textarea id="c-msg" name="message" rows="5" required placeholder="اكتب المسألة التي تريد شرحها…"></textarea>
+        </div>
+        <p class="contact__hint" data-reveal>عند الإرسال سيُفتح واتساب برسالتك جاهزةً. لا يُحفظ شيء على الموقع.</p>
+        <button type="submit" class="btn btn--accent contact__submit">
+          <Icon name="whatsapp" size={18} /> أرسل عبر واتساب
+        </button>
+      </form>
+
+      <aside class="contact__aside" data-reveal>
+        <h2 class="h3 thin">قنوات مباشرة</h2>
+        <ul class="contact__channels" role="list">
+          <li>
+            <a href={whatsappLink('مرحباً أستاذ.')} target="_blank" rel="noopener">
+              <Icon name="whatsapp" size={20} /> <span>واتساب<small>الأسرع للرد</small></span>
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${teacher.email}`}>
+              <Icon name="mail" size={20} /> <span>البريد<small class="ltr">{teacher.email}</small></span>
+            </a>
+          </li>
+          {teacher.social.filter((s) => s.icon !== 'whatsapp').map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener">
+                <Icon name={s.icon} size={20} /> <span>{s.label}<small>{s.handle}</small></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="contact__formats">
+          <h2 class="h3 thin">صيغ الدراسة</h2>
+          <ul role="list">
+            {teacher.courseFormats.map((c) => (
+              <li>
+                <strong>{c.title}</strong>
+                <span>{c.summary}</span>
+                <em>{c.cadence}</em>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact__grid { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3.5rem); align-items: start; }
+  .contact__form { display: grid; gap: var(--s-5); }
+  .field { display: grid; gap: var(--s-2); }
+  .field label { color: var(--ink); font-size: var(--fs-small); }
+  .field__opt { color: var(--ink-3); }
+  .field input, .field textarea {
+    padding: 0.7em 0.9em; border: 1px solid var(--line-strong); border-radius: var(--r-control);
+    background: var(--raised); color: var(--ink); font: inherit; resize: vertical;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: var(--ink-3); }
+  .field input:focus-visible, .field textarea:focus-visible { border-color: var(--accent); }
+  .contact__hint { color: var(--ink-3); font-size: var(--fs-small); }
+  .contact__submit { justify-self: start; }
+
+  .contact__aside { display: grid; gap: var(--s-7); padding: clamp(1.5rem, 4vw, 2rem); background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-card); }
+  .contact__channels { display: grid; gap: var(--s-2); margin-block-start: var(--s-4); }
+  .contact__channels a { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); align-items: center; padding: var(--s-3); border-radius: var(--r-control); color: var(--ink); transition: background var(--dur-1) var(--ease); }
+  .contact__channels a:hover { background: var(--raised); }
+  .contact__channels span { display: grid; }
+  .contact__channels small { color: var(--ink-3); font-size: var(--fs-small); }
+  .contact__channels :global(.icon) { color: var(--accent); }
+  .contact__formats ul { display: grid; gap: var(--s-5); margin-block-start: var(--s-4); }
+  .contact__formats li { display: grid; gap: 2px; padding-block-start: var(--s-3); border-block-start: 2px solid var(--accent); }
+  .contact__formats strong { font-weight: var(--w-reg); }
+  .contact__formats span { color: var(--ink-2); font-size: var(--fs-small); }
+  .contact__formats em { color: var(--ink-3); font-size: var(--fs-small); font-style: normal; }
+
+  @media (min-width: 880px) { .contact__grid { grid-template-columns: 1.2fr 0.8fr; gap: var(--s-9); } }
+</style>
+
+<script>
+  import { teacher } from '@/config/teacher';
+  const form = document.querySelector('[data-contact-form]') as HTMLFormElement | null;
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get('name') || '').trim();
+    const grade = String(data.get('grade') || '').trim();
+    const message = String(data.get('message') || '').trim();
+    const lines = [
+      name ? `أنا ${name}.` : 'مرحباً أستاذ.',
+      grade ? `المستوى: ${grade}.` : '',
+      message ? `سؤالي: ${message}` : '',
+    ].filter(Boolean);
+    const url = `https://wa.me/${teacher.whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`;
+    window.open(url, '_blank', 'noopener');
+  });
+</script>

@@ -1,0 +1,159 @@
+---
+import '@/styles/global.css';
+import '@/styles/math.css';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import Loader from '@/components/Loader.astro';
+import { site } from '@/config/site';
+import { teacher, usingPlaceholders } from '@/config/teacher';
+
+interface Props {
+  title?: string;
+  description?: string;
+  page?: string;
+  loader?: boolean;
+  ogImage?: string;
+}
+const {
+  title,
+  description = site.description,
+  page = '/',
+  loader = false,
+  ogImage = '/og.png',
+} = Astro.props;
+
+const pageTitle = site.titleTemplate(title);
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://ustath-riyadiyat.example').toString();
+const ogUrl = new URL(ogImage, Astro.site ?? 'https://ustath-riyadiyat.example').toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${canonical}#teacher`,
+      name: teacher.name,
+      jobTitle: teacher.title,
+      description: teacher.bio,
+      knowsAbout: ['رياضيات البكالوريا العلمية', 'التحليل الرياضي', 'الأعداد العقدية', 'الاحتمالات', 'الهندسة الفراغية'],
+      address: { '@type': 'PostalAddress', addressLocality: teacher.city, addressCountry: teacher.country },
+    },
+    {
+      '@type': 'EducationalOrganization',
+      '@id': `${canonical}#org`,
+      name: teacher.brandName,
+      description: site.description,
+      areaServed: teacher.country,
+      knowsLanguage: 'ar',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${canonical}#site`,
+      name: site.titleTemplate(),
+      inLanguage: 'ar',
+      url: Astro.site?.toString() ?? canonical,
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#f3f1ea" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- local fonts: preload both weights (small, above-the-fold display + body) -->
+    <link rel="preload" href="/fonts/madika-regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/madika-thin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:site_name" content={teacher.brandName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1376" />
+    <meta property="og:image:height" content="768" />
+    <meta property="og:image:alt" content="منحنٍ متشابك يتحوّل إلى منحنٍ بسيط أنيق على ورق رسم بياني" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">تخطَّ إلى المحتوى</a>
+    <div class="graph-bg" aria-hidden="true"></div>
+
+    {loader && <Loader />}
+
+    <Nav page={page} />
+
+    <main id="main" class="page-enter">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {import.meta.env.DEV && usingPlaceholders && (
+      <div class="dev-banner no-print" role="note">
+        بيانات تجريبية. راجع <code>src/config/teacher.ts</code> قبل النشر.
+        <button type="button" data-dev-dismiss aria-label="إغلاق">✕</button>
+      </div>
+    )}
+
+    <style>
+      .page-enter { animation: pageEnter var(--dur-3) var(--ease) both; }
+      @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+      @media (prefers-reduced-motion: reduce) { .page-enter { animation: none; } }
+
+      .dev-banner {
+        position: fixed;
+        inset-block-end: var(--s-4);
+        inset-inline-start: var(--s-4);
+        z-index: 120;
+        display: flex;
+        align-items: center;
+        gap: var(--s-3);
+        padding: var(--s-2) var(--s-4);
+        background: var(--ink);
+        color: var(--chalk);
+        border-radius: var(--r-control);
+        font-size: var(--fs-small);
+        box-shadow: var(--sh-2);
+      }
+      .dev-banner code { color: var(--accent-bright); }
+      .dev-banner button { color: var(--chalk-2); font-size: 0.9em; }
+    </style>
+
+    <!-- scroll-reveal: cheap IntersectionObserver, no scroll listeners -->
+    <script>
+      const items = document.querySelectorAll('[data-reveal]');
+      if (items.length) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.setAttribute('data-inview', '');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.12 }
+        );
+        items.forEach((el) => io.observe(el));
+      }
+      const dismiss = document.querySelector('[data-dev-dismiss]');
+      dismiss?.addEventListener('click', (e) => (e.currentTarget as HTMLElement).closest('.dev-banner')?.remove());
+    </script>
+  </body>
+</html>

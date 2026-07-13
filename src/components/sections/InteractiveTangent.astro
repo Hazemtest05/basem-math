@@ -1,0 +1,274 @@
+---
+import { tangentLesson as L } from '@/data/lessons';
+import Formula from '@/components/Math.astro';
+import Icon from '@/components/Icon.astro';
+
+/* Build-time graph geometry (shared by SSR fallback + JS enhancement). */
+const xmin = -1.4, xmax = 4.4, ymin = -3, ymax = 6;
+const W = 300, H = 430, pad = 24;
+const s = Math.min((W - 2 * pad) / (xmax - xmin), (H - 2 * pad) / (ymax - ymin));
+const ox = pad + ((W - 2 * pad) - s * (xmax - xmin)) / 2;
+const oy = pad + ((H - 2 * pad) - s * (ymax - ymin)) / 2;
+const X = (x: number) => ox + (x - xmin) * s;
+const Y = (y: number) => oy + (ymax - y) * s;
+const f = (x: number) => x * x - 3 * x;
+
+let dCurve = '';
+const steps = 80;
+for (let i = 0; i <= steps; i++) {
+  const x = xmin + ((xmax - xmin) * i) / steps;
+  dCurve += (i === 0 ? 'M' : 'L') + X(x).toFixed(1) + ' ' + Y(f(x)).toFixed(1) + ' ';
+}
+const aX = L.plot.xFocus;           // 2
+const aY = f(aX);                    // -2
+const m = 2 * aX - 3;                // 1
+// tangent y = m(x-a)+f(a) across the view
+const tx0 = xmin, tx1 = xmax;
+const ty0 = m * (tx0 - aX) + aY, ty1 = m * (tx1 - aX) + aY;
+
+// integer gridline positions (precomputed to keep the template free of comparisons)
+const xticks: number[] = [];
+for (let xv = Math.ceil(xmin); xv <= Math.floor(xmax); xv++) xticks.push(xv);
+const yticks: number[] = [];
+for (let yv = Math.ceil(ymin); yv <= Math.floor(ymax); yv++) yticks.push(yv);
+---
+<section class="lesson section" id="tangent" aria-labelledby="lesson-title" data-lesson
+  data-x={JSON.stringify({ xmin, xmax, ymin, ymax, ox, oy, s })}>
+  <div class="wrap">
+    <header class="lesson__head" data-reveal>
+      <p class="lesson__kicker">{L.eyebrow}</p>
+      <h2 id="lesson-title" class="h2 thin">{L.title}</h2>
+      <p class="lead measure">{L.problemLead}</p>
+      <p class="lesson__fn"><Formula tex={L.fnLatex} /> <span class="lesson__at">عند <Formula tex={L.pointLatex} /></span></p>
+    </header>
+
+    <div class="lesson__work">
+      <!-- STAGE -->
+      <figure class="lesson__stage" data-reveal>
+        <svg class="lesson__svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="منحنٍ للتابع مع مماس عند الفاصلة 2">
+          <!-- grid -->
+          <g stroke="var(--grid)" stroke-width="1">
+            {xticks.map((xv) => <line x1={X(xv)} y1={oy} x2={X(xv)} y2={oy + s * (ymax - ymin)} />)}
+            {yticks.map((yv) => <line x1={ox} y1={Y(yv)} x2={ox + s * (xmax - xmin)} y2={Y(yv)} />)}
+          </g>
+          <!-- axes -->
+          <g stroke="var(--grid-major)" stroke-width="1.5">
+            <line x1={ox} y1={Y(0)} x2={ox + s * (xmax - xmin)} y2={Y(0)} />
+            <line x1={X(0)} y1={oy} x2={X(0)} y2={oy + s * (ymax - ymin)} />
+          </g>
+          <!-- parabola -->
+          <path d={dCurve.trim()} fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" />
+
+          <!-- secant/tangent line (JS updates; SSR shows the tangent) -->
+          <line data-line x1={X(tx0)} y1={Y(ty0)} x2={X(tx1)} y2={Y(ty1)} stroke="var(--accent)" stroke-width="2.4" stroke-dasharray="0" />
+          <!-- fixed point A and moving point B -->
+          <circle data-pa cx={X(aX)} cy={Y(aY)} r="5.5" fill="var(--ink)" />
+          <circle data-pb cx={X(aX)} cy={Y(aY)} r="5" fill="var(--accent)" />
+          <text data-alabel x={X(aX) + 8} y={Y(aY) + 18} fill="var(--ink-2)" font-size="12">A(2, -2)</text>
+        </svg>
+
+        <div class="lesson__control">
+          <label for="h-range" class="lesson__control-label">
+            المسافة <Formula tex="h" /> بين النقطتين
+            <span data-slope-badge class="lesson__slope">الميل = 1</span>
+          </label>
+          <input id="h-range" type="range" min="1" max="200" value="1" data-h-range aria-label="قرّب النقطة الثانية من الأولى" />
+          <p class="lesson__control-hint">حرّك نحو اليسار: الوتر يصبح مماساً، والميل يستقرّ عند 1.</p>
+        </div>
+      </figure>
+
+      <!-- PANEL -->
+      <div class="lesson__panel">
+        <ol class="lesson__hints" data-reveal>
+          {L.hints.map((h, i) => (
+            <li class="hint" data-hint-item hidden={i !== 0 ? true : undefined}>
+              <span class="hint__tag">{h.label}</span>
+              <p class="hint__body">{h.body}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div class="lesson__buttons">
+          <button type="button" class="btn btn--ghost" data-hint-next>
+            أظهر التلميح التالي <Icon name="arrow" size={16} />
+          </button>
+          <button type="button" class="btn btn--accent" data-reveal-solution hidden>
+            أظهر الحل
+          </button>
+        </div>
+
+        <div class="lesson__solution" data-solution hidden>
+          <p class="lesson__solution-lead">معادلة المماس:</p>
+          <Formula tex={L.solutionLatex} block />
+          <p class="lesson__solution-note">{L.solutionNote}</p>
+        </div>
+
+        <aside class="lesson__mistake" data-reveal>
+          <span class="lesson__mistake-tag"><Icon name="close" size={14} /> خطأ شائع</span>
+          <p class="lesson__mistake-row">
+            <span class="wrong"><Formula tex={L.commonMistake.wrong} /></span>
+            <span class="arrow" aria-hidden="true">→</span>
+            <span class="right"><Formula tex={L.commonMistake.right} /></span>
+          </p>
+          <p class="lesson__mistake-note">{L.commonMistake.note}</p>
+        </aside>
+
+        <form class="lesson__mini" data-mini>
+          <p class="lesson__mini-q">{L.mini.prompt}</p>
+          <div class="lesson__mini-row">
+            <input type="number" step="any" inputmode="decimal" data-mini-input aria-label="جوابك" placeholder={L.mini.unitHint} />
+            <button type="submit" class="btn btn--accent">تحقّق</button>
+          </div>
+          <p class="lesson__mini-feedback" data-mini-feedback role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lesson__head { max-width: 60ch; margin-block-end: var(--s-7); }
+  .lesson__kicker { color: var(--ink-3); font-size: var(--fs-small); margin-block-end: var(--s-3); }
+  .lesson__fn { margin-block-start: var(--s-4); font-size: var(--fs-h3); }
+  .lesson__at { color: var(--ink-2); font-size: var(--fs-body); }
+
+  .lesson__work { display: grid; grid-template-columns: 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+
+  .lesson__stage { position: sticky; top: 88px; }
+  .lesson__svg { width: 100%; max-width: 420px; height: auto; margin-inline: auto; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--sh-1); }
+  .lesson__control { margin-block-start: var(--s-4); max-width: 420px; margin-inline: auto; }
+  .lesson__control-label { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); font-size: var(--fs-small); color: var(--ink-2); }
+  .lesson__slope { color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+  .lesson__control-hint { margin-block-start: var(--s-2); font-size: var(--fs-small); color: var(--ink-3); }
+  /* thin visible track inside a tall (touch-friendly) hit area */
+  input[type='range'][data-h-range] {
+    inline-size: 100%; margin-block-start: var(--s-3); appearance: none; -webkit-appearance: none;
+    block-size: 34px; background: transparent; outline-offset: 6px; cursor: pointer;
+    /* left = small h (tangent). visually invert so dragging left simplifies */
+    direction: ltr;
+  }
+  input[type='range'][data-h-range]::-webkit-slider-runnable-track { block-size: 4px; border-radius: var(--r-pill); background: var(--line-strong); }
+  input[type='range'][data-h-range]::-moz-range-track { block-size: 4px; border-radius: var(--r-pill); background: var(--line-strong); }
+  input[type='range'][data-h-range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; margin-top: -8px; inline-size: 20px; block-size: 20px; border-radius: 50%; background: var(--paper); border: 2.5px solid var(--accent); cursor: grab; }
+  input[type='range'][data-h-range]::-moz-range-thumb { inline-size: 20px; block-size: 20px; border-radius: 50%; background: var(--paper); border: 2.5px solid var(--accent); cursor: grab; }
+
+  .lesson__hints { display: grid; gap: var(--s-3); }
+  .hint { padding: var(--s-4) var(--s-5); background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card); }
+  .hint[hidden] { display: none; }
+  .hint__tag { display: inline-block; font-size: var(--fs-small); color: var(--accent-ink); margin-block-end: var(--s-2); }
+  .hint__body { color: var(--ink-2); font-size: var(--fs-body); line-height: 1.6; }
+
+  .lesson__buttons { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-block-start: var(--s-5); }
+  .lesson__buttons button[hidden] { display: none; }
+
+  .lesson__solution { margin-block-start: var(--s-5); padding: var(--s-5); background: var(--accent-wash); border: 1px solid var(--accent-wash-2); border-radius: var(--r-card); }
+  .lesson__solution[hidden] { display: none; }
+  .lesson__solution-lead { color: var(--ink-2); font-size: var(--fs-small); }
+  .lesson__solution-note { margin-block-start: var(--s-3); color: var(--ink-2); font-size: var(--fs-small); }
+
+  .lesson__mistake { margin-block-start: var(--s-6); padding: var(--s-5); background: var(--raised); border: 1px dashed var(--line-strong); border-radius: var(--r-card); }
+  .lesson__mistake-tag { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--accent-ink); font-size: var(--fs-small); }
+  .lesson__mistake-row { display: flex; align-items: center; gap: var(--s-4); margin-block: var(--s-3); font-size: var(--fs-h3); flex-wrap: wrap; }
+  .lesson__mistake-row .wrong { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--accent); }
+  .lesson__mistake-row .arrow { color: var(--accent); }
+  .lesson__mistake-note { color: var(--ink-2); font-size: var(--fs-small); }
+
+  .lesson__mini { margin-block-start: var(--s-6); padding: var(--s-5); border: 1px solid var(--line); border-radius: var(--r-card); background: var(--paper-2); }
+  .lesson__mini-q { color: var(--ink); }
+  .lesson__mini-row { display: flex; gap: var(--s-3); margin-block-start: var(--s-4); }
+  .lesson__mini-row input {
+    flex: 1; min-width: 0; padding: 0.6em 0.9em; border: 1px solid var(--line-strong);
+    border-radius: var(--r-control); background: var(--raised); color: var(--ink); direction: ltr; text-align: start;
+  }
+  .lesson__mini-row input:focus-visible { border-color: var(--accent); }
+  .lesson__mini-feedback { margin-block-start: var(--s-3); font-size: var(--fs-small); min-height: 1.2em; }
+  .lesson__mini-feedback.is-ok { color: var(--ok); }
+  .lesson__mini-feedback.is-no { color: var(--accent-ink); }
+
+  @media (min-width: 900px) {
+    .lesson__work { grid-template-columns: 0.9fr 1.1fr; gap: clamp(2rem, 5vw, 4rem); }
+  }
+</style>
+
+<script>
+  import { tangentLesson as L } from '@/data/lessons';
+
+  const root = document.querySelector('[data-lesson]') as HTMLElement | null;
+  if (root) {
+    const map = JSON.parse(root.dataset.x || '{}');
+    const { xmin, xmax, ymax, ox, oy, s } = map;
+    const X = (x: number) => ox + (x - xmin) * s;
+    const Y = (y: number) => oy + (ymax - y) * s;
+    const f = (x: number) => x * x - 3 * x;
+    const aX = L.plot.xFocus, aY = f(aX);
+
+    const line = root.querySelector('[data-line]') as SVGLineElement;
+    const pb = root.querySelector('[data-pb]') as SVGCircleElement;
+    const slopeBadge = root.querySelector('[data-slope-badge]') as HTMLElement;
+    const hRange = root.querySelector('[data-h-range]') as HTMLInputElement;
+
+    // slider 1..200 → h from ~0.02 to 2.0 (higher value = larger h)
+    const toH = (v: number) => 0.02 + (v / 200) * 1.98;
+    const draw = (h: number) => {
+      const bX = aX + h, bY = f(bX);
+      const slope = Math.abs(h) < 1e-6 ? 2 * aX - 3 : (bY - aY) / (bX - aX);
+      // line through A with this slope, across the view
+      const y0 = slope * (xmin - aX) + aY, y1 = slope * (xmax - aX) + aY;
+      line.setAttribute('x1', String(X(xmin))); line.setAttribute('y1', String(Y(y0)));
+      line.setAttribute('x2', String(X(xmax))); line.setAttribute('y2', String(Y(y1)));
+      pb.setAttribute('cx', String(X(bX))); pb.setAttribute('cy', String(Y(bY)));
+      slopeBadge.textContent = 'الميل = ' + slope.toFixed(2).replace(/\.00$/, '');
+    };
+    hRange.addEventListener('input', () => draw(toH(+hRange.value)));
+    draw(toH(+hRange.value));
+
+    // progressive hints
+    const hints = Array.from(root.querySelectorAll('[data-hint-item]')) as HTMLElement[];
+    const nextBtn = root.querySelector('[data-hint-next]') as HTMLButtonElement;
+    const solveBtn = root.querySelector('[data-reveal-solution]') as HTMLButtonElement;
+    const solution = root.querySelector('[data-solution]') as HTMLElement;
+    let shown = 1;
+    const hTargets = [1.6, 1.0, 0.02, 0.02]; // hint i drives the visual closer to tangent
+    const animateH = (target: number) => {
+      const from = toH(+hRange.value);
+      const t0 = performance.now(); const dur = 500;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { const v = Math.round(((target - 0.02) / 1.98) * 200); hRange.value = String(v); draw(target); return; }
+      const tick = (now: number) => {
+        const u = Math.min(1, (now - t0) / dur);
+        const h = from + (target - from) * (1 - Math.pow(1 - u, 3));
+        hRange.value = String(Math.round(((h - 0.02) / 1.98) * 200));
+        draw(h);
+        if (u < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    nextBtn.addEventListener('click', () => {
+      if (shown < hints.length) {
+        hints[shown].hidden = false;
+        animateH(hTargets[shown] ?? 0.02);
+        shown++;
+      }
+      if (shown >= hints.length) { nextBtn.hidden = true; solveBtn.hidden = false; }
+    });
+    solveBtn.addEventListener('click', () => {
+      solution.hidden = false;
+      solveBtn.hidden = true;
+      animateH(0.02);
+      solution.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+    });
+
+    // mini question
+    const form = root.querySelector('[data-mini]') as HTMLFormElement;
+    const input = root.querySelector('[data-mini-input]') as HTMLInputElement;
+    const fb = root.querySelector('[data-mini-feedback]') as HTMLElement;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = parseFloat(input.value.replace(',', '.'));
+      if (Number.isNaN(val)) { fb.textContent = 'اكتب رقماً أولاً.'; fb.className = 'lesson__mini-feedback is-no'; return; }
+      const ok = Math.abs(val - L.mini.answer) <= L.mini.tolerance;
+      fb.textContent = ok ? L.mini.correct : L.mini.wrong;
+      fb.className = 'lesson__mini-feedback ' + (ok ? 'is-ok' : 'is-no');
+    });
+  }
+</script>

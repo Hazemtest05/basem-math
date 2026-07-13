@@ -1,0 +1,124 @@
+---
+import { unitsByBook, BOOK_TITLES, DIFFICULTY_LABEL, units, totalLessons } from '@/data/curriculum';
+import UnitGlyph from '@/components/UnitGlyph.astro';
+import Icon from '@/components/Icon.astro';
+const books: (1 | 2)[] = [1, 2];
+---
+<section class="curr section" aria-labelledby="curr-title" data-curr>
+  <div class="wrap">
+    <header class="curr__head" data-reveal>
+      <div>
+        <p class="eyebrow">خريطة المنهاج</p>
+        <h2 id="curr-title" class="h2 thin">كتابان، أربع عشرة وحدة، طريقٌ واحد واضح.</h2>
+        <p class="lead measure">من المتتاليات إلى الاحتمالات. اختر كتاباً لترى وحداته، أو استكشف الخريطة الكاملة.</p>
+      </div>
+      <p class="curr__stat"><span class="num">{units.length}</span> وحدة · <span class="num">{totalLessons}</span> درساً</p>
+    </header>
+
+    <div class="curr__tabs" role="tablist" aria-label="اختر الكتاب" data-reveal>
+      {books.map((b) => (
+        <button type="button" role="tab" id={`booktab-${b}`} aria-controls={`bookpanel-${b}`}
+          class:list={['curr__tab', { 'is-active': b === 1 }]}
+          aria-selected={b === 1 ? 'true' : 'false'} tabindex={b === 1 ? 0 : -1} data-book-tab={b}>
+          {BOOK_TITLES[b].en === 'Analysis' ? 'الكتاب الأول · التحليل' : 'الكتاب الثاني · الهندسة والعقديّات'}
+        </button>
+      ))}
+    </div>
+
+    {books.map((b) => (
+      <div role="tabpanel" id={`bookpanel-${b}`} aria-labelledby={`booktab-${b}`} tabindex="0"
+        class="curr__panel" data-book-panel={b} hidden={b !== 1 ? true : undefined}>
+      <ul class="curr__grid" role="list">
+        {unitsByBook(b).map((u, i) => (
+          <li class="ucard" data-reveal style={`--reveal-delay:${i * 45}ms`}>
+            <a class="ucard__link" href={`/curriculum#${u.slug}`}>
+              <span class="ucard__glyph"><UnitGlyph motif={u.motif} size={44} /></span>
+              <span class="ucard__no num">وحدة {u.unitNo}</span>
+              <h3 class="ucard__title">{u.titleAr}</h3>
+              <p class="ucard__hook">{u.hook}</p>
+              <span class="ucard__foot">
+                <span class:list={['ucard__diff', `d${u.difficulty}`]}>{DIFFICULTY_LABEL[u.difficulty]}</span>
+                <span class="ucard__lessons"><span class="num">{u.lessonsAr.length}</span> دروس</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      </div>
+    ))}
+
+    <div class="curr__cta" data-reveal>
+      <a href="/curriculum" class="btn btn--ghost">استكشف الخريطة الكاملة <Icon name="arrow" size={16} /></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .curr__head { display: grid; gap: var(--s-4); margin-block-end: var(--s-6); }
+  .curr__stat { color: var(--ink-2); font-size: var(--fs-small); }
+  .curr__tabs { display: inline-flex; gap: var(--s-1); padding: var(--s-1); background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-pill); margin-block-end: var(--s-6); flex-wrap: wrap; }
+  .curr__tab { padding: 0.55em 1.1em; border-radius: var(--r-pill); color: var(--ink-2); font-size: var(--fs-small); transition: background var(--dur-1) var(--ease), color var(--dur-1); }
+  .curr__tab.is-active { background: var(--ink); color: var(--chalk); }
+
+  .curr__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-4); }
+  .curr__panel[hidden] { display: none; }
+  .curr__panel:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 6px; border-radius: var(--r-card); }
+  @media (pointer: coarse) { .curr__tab { padding-block: 0.7em; } }
+  .ucard { height: 100%; }
+  .ucard__link {
+    display: grid; gap: var(--s-2); height: 100%; padding: var(--s-5);
+    background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card);
+    transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), border-color var(--dur-1);
+  }
+  .ucard__link:hover { transform: translateY(-3px); box-shadow: var(--sh-2); border-color: var(--line-strong); }
+  .ucard__glyph { color: var(--ink); }
+  .ucard__no { color: var(--ink-3); font-size: var(--fs-small); }
+  .ucard__title { font-size: var(--fs-h3); }
+  .ucard__hook { color: var(--ink-2); font-size: var(--fs-small); line-height: 1.6; }
+  .ucard__foot { display: flex; align-items: center; justify-content: space-between; margin-block-start: auto; padding-block-start: var(--s-3); border-block-start: 1px solid var(--line); }
+  .ucard__diff { font-size: var(--fs-micro); padding: 0.25em 0.7em; border-radius: var(--r-pill); border: 1px solid var(--line-strong); color: var(--ink-2); }
+  .ucard__diff.d1 { color: var(--ok); border-color: var(--ok-wash); background: var(--ok-wash); }
+  .ucard__diff.d3 { color: var(--accent-ink); border-color: var(--accent-wash-2); background: var(--accent-wash); }
+  .ucard__lessons { color: var(--ink-3); font-size: var(--fs-small); }
+
+  .curr__cta { margin-block-start: var(--s-6); }
+
+  @media (min-width: 560px) { .curr__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) {
+    .curr__head { grid-template-columns: 1fr auto; align-items: end; }
+    .curr__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-curr]');
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll('[data-book-tab]')) as HTMLElement[];
+    const panels = Array.from(root.querySelectorAll('[data-book-panel]')) as HTMLElement[];
+    const activate = (tab: HTMLElement) => {
+      const b = tab.getAttribute('data-book-tab');
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      panels.forEach((p) => { (p as HTMLElement).hidden = p.getAttribute('data-book-panel') !== b; });
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => activate(tab));
+      // WAI-ARIA tabs keyboard model (RTL: ArrowRight = previous, ArrowLeft = next)
+      tab.addEventListener('keydown', (e) => {
+        let ni: number | null = null;
+        if (e.key === 'ArrowRight') ni = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'ArrowLeft') ni = (i + 1) % tabs.length;
+        else if (e.key === 'Home') ni = 0;
+        else if (e.key === 'End') ni = tabs.length - 1;
+        if (ni === null) return;
+        e.preventDefault();
+        tabs[ni].focus();
+        activate(tabs[ni]);
+      });
+    });
+  }
+</script>

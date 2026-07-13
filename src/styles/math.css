@@ -1,0 +1,100 @@
+/* =============================================================================
+   Math typesetting styles for texlite output. Rendered entirely in Madika.
+   ============================================================================= */
+.math {
+  font-family: var(--font);
+  font-weight: var(--w-reg);
+  font-style: normal;
+  line-height: 1.35;
+  white-space: nowrap;
+  font-feature-settings: 'ss01';
+}
+.math--block {
+  display: block;
+  text-align: center;
+  font-size: 1.14em;
+  margin-block: var(--s-4);
+  white-space: normal;
+}
+
+/* italic-ish single latin variables read as "math variables" */
+.math :is(sub, sup) { line-height: 0; }
+.math sup { font-size: 0.72em; vertical-align: 0.62em; }
+.math sub { font-size: 0.72em; vertical-align: -0.28em; }
+
+/* fractions */
+.mfrac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  margin-inline: 0.14em;
+}
+.mfrac > .mnum { padding-inline: 0.35em; }
+.mfrac > .mden { padding-inline: 0.35em; border-top: 1.4px solid currentColor; }
+.mfrac .mnum, .mfrac .mden { font-size: 0.92em; }
+
+/* square root */
+.msqrt { display: inline-flex; align-items: flex-start; }
+.msqrt > .mroot { transform: translateY(-0.02em); }
+.msqrt > .mrad {
+  border-top: 1.4px solid currentColor;
+  padding-inline-start: 0.12em;
+  padding-block-start: 0.06em;
+  margin-inline-start: -0.06em;
+}
+
+/* vector arrow (RTL-safe: arrow points as in LTR math over the symbol) */
+.mvec { position: relative; display: inline-block; padding-block-start: 0.28em; }
+.mvec::before {
+  content: '→';
+  position: absolute;
+  inset-block-start: -0.42em;
+  inset-inline: 0;
+  font-size: 0.7em;
+  text-align: center;
+  transform: scaleX(1);
+}
+
+/* overline / conjugate */
+.mbar { display: inline-block; border-top: 1.3px solid currentColor; padding-block-start: 0.04em; }
+.mhat { position: relative; display: inline-block; padding-block-start: 0.2em; }
+.mhat::before { content: '^'; position: absolute; inset-block-start: -0.5em; inset-inline: 0; text-align: center; font-size: 0.8em; }
+
+/* named operators upright */
+.mop, .mtext { font-style: normal; padding-inline-end: 0.08em; }
+.mcal { font-style: italic; }
+
+/* limits/integrals sub placed low */
+.mop + sub { margin-inline-start: -0.2em; }
+
+/* binomial coefficient */
+.mbinom { display: inline-flex; align-items: center; vertical-align: middle; }
+.mbinom .mparen { font-size: 1.6em; font-weight: var(--w-thin); }
+.mbinom-col { display: inline-flex; flex-direction: column; text-align: center; padding-inline: 0.1em; font-size: 0.9em; }
+
+/* boxed result */
+.mboxed {
+  display: inline-block;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
+  background: var(--accent-wash);
+}
+
+/* cases */
+.mcases { display: inline-flex; align-items: stretch; vertical-align: middle; gap: 0.2em; }
+.mcases-brace { font-size: 2.4em; font-weight: var(--w-thin); line-height: 1; align-self: center; }
+.mcases-rows { display: inline-flex; flex-direction: column; gap: 0.15em; font-size: 0.92em; }
+.mcase-row { display: inline-flex; gap: 0.5em; }
+
+/* a soft "formula plate" wrapper used on cards */
+/* a recessed formula panel (tint only, no border) so it never reads as a card
+   nested inside a card when placed on a bordered surface */
+.formula-plate {
+  display: block;
+  padding: var(--s-4) var(--s-5);
+  background: var(--paper-2);
+  border-radius: var(--r-card);
+  overflow-x: auto;
+}

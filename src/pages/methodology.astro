@@ -1,0 +1,32 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Methodology from '@/components/sections/Methodology.astro';
+import CTA from '@/components/sections/CTA.astro';
+import MarginNote from '@/components/MarginNote.astro';
+---
+<Base page="/methodology" title="الطريقة" description="طريقة التدريس: من فهم الفكرة إلى إتقان طريقة الامتحان، في ست خطوات واضحة مبنية على بنية المنهاج.">
+  <PageHero
+    eyebrow="الطريقة"
+    title="التعليم ليس حلّ المسألة أمامك، بل جعلك قادراً على حلّها وحدك."
+    lead="لكل درسٍ البنية نفسها. حين تعرف الخطوة التالية دائماً، يتحوّل القلق إلى ثقة." />
+
+  <Methodology />
+
+  <section class="section" style="padding-block-start:0">
+    <div class="wrap methodology-notes">
+      <MarginNote type="exam" class="mn" data-reveal>
+        <strong>فكرة امتحانية:</strong> أنهِ كل جزءٍ بجملةٍ تُجيب عن السؤال المطروح: العدد، أو المجموعة، أو الطبيعة الهندسية. الاستدلال المعلّق يفقد نصف علامته.
+      </MarginNote>
+      <MarginNote type="condition" class="mn" data-reveal>
+        <strong>شرط مهم:</strong> قبل تطبيق أي مبرهنة، تحقّق من شروطها. المبرهنة الصحيحة في المكان الخاطئ خطأ كامل.
+      </MarginNote>
+    </div>
+  </section>
+
+  <CTA />
+</Base>
+<style>
+  .methodology-notes { display: grid; gap: var(--s-4); }
+  @media (min-width: 760px) { .methodology-notes { grid-template-columns: 1fr 1fr; } }
+</style>

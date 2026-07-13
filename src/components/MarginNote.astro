@@ -1,0 +1,65 @@
+---
+/* Teacher margin note. Mirrors the guide's five authentic alert types. Renders
+   as a handwritten-feeling aside with a red-pen accent. */
+interface Props {
+  type?: 'tip' | 'mistake' | 'exam' | 'special' | 'condition';
+  class?: string;
+}
+const { type = 'tip', class: cls = '' } = Astro.props;
+const META: Record<string, { label: string; glyph: string }> = {
+  tip: { label: 'تنبيه', glyph: '!' },
+  mistake: { label: 'خطأ شائع', glyph: '✕' },
+  exam: { label: 'فكرة امتحانية', glyph: '★' },
+  special: { label: 'حالة خاصة', glyph: '◆' },
+  condition: { label: 'شرط مهم', glyph: '§' },
+};
+const m = META[type];
+---
+<aside class:list={['mnote', `mnote--${type}`, cls]}>
+  <span class="mnote__tab"><span class="mnote__glyph" aria-hidden="true">{m.glyph}</span>{m.label}</span>
+  <div class="mnote__body"><slot /></div>
+</aside>
+
+<style>
+  .mnote {
+    position: relative;
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    background: var(--accent-wash);
+    border: 1px solid var(--accent-wash-2);
+    border-radius: var(--r-card);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .mnote__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    align-self: start;
+    color: var(--accent-ink);
+    font-size: var(--fs-small);
+    padding-block-end: var(--s-2);
+    /* hand-drawn pen underline, not a side stripe */
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1.5px;
+  }
+  .mnote__glyph {
+    display: grid;
+    place-items: center;
+    inline-size: 1.35em;
+    block-size: 1.35em;
+    border-radius: var(--r-pill);
+    background: var(--accent-wash-2);
+    color: var(--accent-ink);
+    font-size: 0.82em;
+    line-height: 1;
+  }
+  .mnote__body :global(.math) { color: var(--ink); }
+  .mnote--exam { background: var(--ok-wash); border-color: color-mix(in srgb, var(--ok) 22%, transparent); }
+  .mnote--exam .mnote__tab { color: var(--ok); background-image: linear-gradient(var(--ok), var(--ok)); }
+  .mnote--exam .mnote__glyph { background: var(--ok-wash); color: var(--ok); }
+</style>

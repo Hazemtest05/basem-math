@@ -1,0 +1,24 @@
+/*
+  Local fonts only. Madika Arabic (TRIAL) shipped as WOFF2 (converted from the
+  supplied .otf originals with fontTools). Two real weights exist: Thin (100)
+  and Regular (400). There is NO bold master, so `font-synthesis` is disabled
+  globally in global.css and hierarchy is built from size + weight contrast.
+  No Google Fonts, no CDN, no system substitution.
+*/
+
+@font-face {
+  font-family: 'Madika';
+  src: url('/fonts/madika-thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+  /* Latin + Arabic + digits + core math glyphs all present in the file. */
+}
+
+@font-face {
+  font-family: 'Madika';
+  src: url('/fonts/madika-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

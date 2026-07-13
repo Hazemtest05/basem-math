@@ -1,0 +1,92 @@
+---
+import { site } from '@/config/site';
+---
+<div class="loader" data-loader aria-hidden="true">
+  <div class="loader__stage">
+    <svg class="loader__svg" viewBox="0 0 220 150" fill="none" aria-hidden="true">
+      <!-- coordinate plane -->
+      <g class="loader__axes" stroke="var(--grid-major)" stroke-width="1">
+        <line x1="18" y1="130" x2="205" y2="130" />
+        <line x1="30" y1="14" x2="30" y2="140" />
+      </g>
+      <g class="loader__ticks" stroke="var(--grid)" stroke-width="1">
+        <line x1="66" y1="16" x2="66" y2="138" /><line x1="102" y1="16" x2="102" y2="138" />
+        <line x1="138" y1="16" x2="138" y2="138" /><line x1="174" y1="16" x2="174" y2="138" />
+        <line x1="20" y1="98" x2="203" y2="98" /><line x1="20" y1="62" x2="203" y2="62" />
+      </g>
+      <!-- the "complicated" tangle, drawn then dissolved -->
+      <path class="loader__tangle" pathLength="1"
+        d="M30 120 C 55 40, 66 128, 92 52 C 112 6, 120 132, 146 66 C 168 18, 176 120, 200 44"
+        stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+      <!-- the simple, elegant curve it resolves into -->
+      <path class="loader__curve" pathLength="1"
+        d="M30 126 C 78 122, 120 96, 205 26"
+        stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" />
+      <circle class="loader__dot" cx="205" cy="26" r="4.5" fill="var(--accent)" />
+    </svg>
+    <p class="loader__word">{site.slogan}</p>
+  </div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-loader);
+    display: grid;
+    place-items: center;
+    background: var(--paper);
+    animation: loaderOut 0.5s var(--ease) 1.75s forwards;
+  }
+  .loader.is-done { animation: loaderOut 0.45s var(--ease) forwards; }
+  .loader.is-instant { display: none; }
+
+  .loader__stage { display: grid; justify-items: center; gap: var(--s-5); width: min(78vw, 460px); }
+  .loader__svg { width: 100%; height: auto; }
+
+  .loader__tangle {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 0.85s var(--ease-inout) 0.05s forwards, fade 0.45s var(--ease) 0.9s forwards;
+  }
+  .loader__curve {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 0.9s var(--ease) 0.8s forwards;
+  }
+  .loader__dot {
+    opacity: 0;
+    animation: rise 0.4s var(--ease) 1.55s forwards;
+  }
+  .loader__word {
+    font-weight: var(--w-thin);
+    font-size: clamp(1.3rem, 1rem + 2.4vw, 2.1rem);
+    color: var(--ink);
+    opacity: 0;
+    animation: rise 0.55s var(--ease) 1.3s forwards;
+  }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fade { to { opacity: 0; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes loaderOut { to { opacity: 0; visibility: hidden; transform: translateY(-1.5%); pointer-events: none; } }
+
+  /* Reduced motion / no animation: never show the loader (never trap the user) */
+  @media (prefers-reduced-motion: reduce) { .loader { display: none; } }
+</style>
+
+<script is:inline>
+  (function () {
+    var el = document.querySelector('[data-loader]');
+    if (!el) return;
+    try {
+      if (sessionStorage.getItem('seenLoader')) { el.classList.add('is-instant'); return; }
+      sessionStorage.setItem('seenLoader', '1');
+    } catch (e) {}
+    document.documentElement.style.overflow = 'hidden';
+    var unlock = function () { document.documentElement.style.overflow = ''; el && el.remove(); };
+    el.addEventListener('animationend', function (ev) { if (ev.animationName === 'loaderOut') unlock(); });
+    // safety net: never trap the user, even if animationend never fires
+    setTimeout(unlock, 3000);
+  })();
+</script>

@@ -1,0 +1,44 @@
+---
+import { teacher, whatsappLink } from '@/config/teacher';
+import Icon from '@/components/Icon.astro';
+const msg = 'مرحباً أستاذ، عندي مسألة تُحيّرني. ممكن نحلّها سوا؟';
+---
+<section class="cta section" aria-labelledby="cta-title">
+  <div class="wrap">
+    <div class="cta__lead" data-reveal>
+      <h2 id="cta-title" class="display cta__title">عندما تصبح الفكرة واضحة، الحلّ يصبح مجرّد خطوات.</h2>
+      <p class="cta__sub">أرسل مسألةً واحدة تُحيّرك. لنرَ معاً أين تختبئ الصعوبة، وكيف تتحوّل إلى خطوات.</p>
+      <div class="cta__actions">
+        <a href={whatsappLink(msg)} class="btn btn--accent cta__primary" target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={18} /> أرسل مسألة على واتساب
+        </a>
+        <a href="/contact" class="btn btn--ghost">اسأل عن الدورة</a>
+      </div>
+    </div>
+
+    <ul class="cta__formats" role="list">
+      {teacher.courseFormats.map((c, i) => (
+        <li class="cta__format" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+          <h3 class="cta__format-title">{c.title}</h3>
+          <p class="cta__format-sum">{c.summary}</p>
+          <p class="cta__format-cadence"><Icon name="compass" size={15} /> {c.cadence}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cta__lead { max-width: 40ch; margin-inline: auto; text-align: center; }
+  .cta__title { font-size: clamp(2rem, 1.2rem + 4vw, 4rem); line-height: 1.08; }
+  .cta__sub { margin-block-start: var(--s-5); color: var(--ink-2); font-size: var(--fs-lead); }
+  .cta__actions { margin-block-start: var(--s-6); display: flex; gap: var(--s-3); justify-content: center; flex-wrap: wrap; }
+
+  .cta__formats { display: grid; grid-template-columns: 1fr; gap: var(--s-5); margin-block-start: var(--s-9); }
+  .cta__format { padding-block-start: var(--s-4); border-block-start: 2px solid var(--accent); }
+  .cta__format-title { font-size: var(--fs-h3); }
+  .cta__format-sum { margin-block-start: var(--s-2); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.6; }
+  .cta__format-cadence { margin-block-start: var(--s-3); display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ink-3); font-size: var(--fs-small); }
+
+  @media (min-width: 780px) { .cta__formats { grid-template-columns: repeat(3, 1fr); gap: var(--s-7); } }
+</style>

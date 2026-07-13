@@ -1,0 +1,44 @@
+---
+import { units, totalLessons } from '@/data/curriculum';
+const evidence = [
+  { big: String(units.length), unit: 'وحدة', label: 'تغطية كاملة', sub: 'من المتتاليات إلى الاحتمالات، كتابان بلا فجوات.' },
+  { big: String(totalLessons), unit: 'درساً', label: 'مبنيّة بالترتيب', sub: 'كل درس: فكرة، مثال محلول، خطأ شائع، تمرين امتحاني.' },
+  { big: '400+', unit: 'مثال', label: 'أمثلة حقيقية', sub: 'محلولة خطوة بخطوة، من مستوى الكتاب والامتحان.' },
+  { big: '17', unit: 'نمطاً', label: 'أنماط المسائل', sub: 'نتدرّب على أنماط الأسئلة، لا على أسئلة منفردة.' },
+];
+---
+<section class="cred section" aria-labelledby="cred-title">
+  <div class="wrap">
+    <header class="cred__head" data-reveal>
+      <h2 id="cred-title" class="h2 thin">لا أرقام مبالغٌ فيها هنا. هذا ما ستحصل عليه فعلاً.</h2>
+      <p class="lead measure">الثقة تُبنى بالشرح لا بالوعود. الأرقام أدناه حقيقية، وتصف المحتوى لا الدعاية.</p>
+    </header>
+
+    <ul class="cred__grid" role="list">
+      {evidence.map((e, i) => (
+        <li class="cred__item" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+          <p class="cred__big thin"><span class="num">{e.big}</span> <span class="cred__unit">{e.unit}</span></p>
+          <p class="cred__label">{e.label}</p>
+          <p class="cred__sub">{e.sub}</p>
+        </li>
+      ))}
+    </ul>
+
+    <p class="cred__note" data-reveal>
+      آراء الطلاب ستُضاف هنا بأسمائهم الحقيقية، لا بشهاداتٍ مُختلَقة. حتى ذلك الحين، جرّب الدرس التفاعلي أعلاه واحكم بنفسك.
+    </p>
+  </div>
+</section>
+
+<style>
+  .cred__head { max-width: 52ch; margin-block-end: var(--s-8); }
+  .cred__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-6) var(--s-5); }
+  .cred__item { padding-block-start: var(--s-4); border-block-start: 2px solid var(--ink); }
+  .cred__big { font-size: clamp(2.4rem, 5vw, 3.8rem); line-height: 1; color: var(--ink); }
+  .cred__unit { font-size: var(--fs-h3); color: var(--ink-2); }
+  .cred__label { margin-block-start: var(--s-3); color: var(--accent-ink); }
+  .cred__sub { margin-block-start: var(--s-2); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.6; max-width: 30ch; }
+  .cred__note { margin-block-start: var(--s-8); color: var(--ink-2); font-size: var(--fs-small); max-width: 62ch; padding-block-start: var(--s-4); border-block-start: 1px solid var(--line-strong); }
+
+  @media (min-width: 820px) { .cred__grid { grid-template-columns: repeat(4, 1fr); gap: var(--s-6); } }
+</style>

@@ -1,0 +1,140 @@
+---
+import { site } from '@/config/site';
+import { teacher, whatsappLink } from '@/config/teacher';
+import Icon from '@/components/Icon.astro';
+interface Props { page?: string; }
+const { page = '/' } = Astro.props;
+const isActive = (href: string) => (href === '/' ? page === '/' : page.startsWith(href));
+---
+<header class="site-nav" data-nav>
+  <div class="wrap site-nav__row">
+    <a href="/" class="brand" aria-label={`${teacher.brandName}، الصفحة الرئيسية`}>
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="2.5" width="27" height="27" rx="8" class="brand__box" />
+          <path d="M7 22 C 11 22, 12 9, 16 9 C 20 9, 21 22, 25 22" class="brand__curve" />
+        </svg>
+      </span>
+      <span class="brand__name">{teacher.brandName}</span>
+    </a>
+
+    <nav class="site-nav__links" aria-label="التنقّل الرئيسي">
+      {site.nav.map((item) => (
+        <a href={item.href} class:list={['navlink', { 'navlink--active': isActive(item.href) }]} aria-current={isActive(item.href) ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="site-nav__actions">
+      <a href={whatsappLink('مرحباً أستاذ، عندي سؤال في الرياضيات.')} class="btn btn--accent site-nav__cta" target="_blank" rel="noopener">
+        <Icon name="whatsapp" size={18} /> راسلني
+      </a>
+      <button type="button" class="site-nav__burger" data-nav-toggle aria-label="فتح القائمة" aria-expanded="false" aria-controls="mobile-menu">
+        <Icon name="menu" size={24} />
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-nav-menu hidden>
+    <div class="mobile-menu__inner">
+      <nav class="mobile-menu__links" aria-label="التنقّل">
+        {site.nav.map((item) => (
+          <a href={item.href} class:list={['mobile-link', { 'mobile-link--active': isActive(item.href) }]}>{item.label}</a>
+        ))}
+      </nav>
+      <a href={whatsappLink('مرحباً أستاذ، عندي سؤال في الرياضيات.')} class="btn btn--accent mobile-menu__cta" target="_blank" rel="noopener">
+        <Icon name="whatsapp" size={18} /> راسلني على واتساب
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-nav {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-nav);
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    border-block-end: 1px solid var(--line);
+  }
+  .site-nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    block-size: 68px;
+  }
+  .brand { display: inline-flex; align-items: center; gap: var(--s-3); }
+  .brand__box { color: var(--ink); opacity: 0.9; }
+  .brand__curve { color: var(--accent); }
+  .brand__name { font-size: 1.32rem; }
+
+  .site-nav__links { display: none; align-items: center; gap: clamp(0.6rem, 1.6vw, 1.6rem); }
+  .navlink {
+    position: relative;
+    color: var(--ink-2);
+    padding: 0.4em 0.2em;
+    transition: color var(--dur-1) var(--ease);
+  }
+  .navlink::after {
+    content: '';
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline: 0;
+    block-size: 1.5px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--dur-2) var(--ease);
+  }
+  .navlink:hover { color: var(--ink); }
+  .navlink:hover::after, .navlink--active::after { transform: scaleX(1); }
+  .navlink--active { color: var(--ink); }
+
+  .site-nav__actions { display: flex; align-items: center; gap: var(--s-3); }
+  .site-nav__cta { display: none; }
+  .site-nav__burger { display: inline-grid; place-items: center; padding: var(--s-2); color: var(--ink); border-radius: var(--r-control); }
+  .site-nav__burger:hover { background: var(--paper-2); }
+
+  .mobile-menu { border-block-start: 1px solid var(--line); background: var(--paper); overflow: hidden; }
+  .mobile-menu[hidden] { display: none; }
+  .mobile-menu__inner { padding: var(--s-5) var(--gutter) var(--s-7); display: grid; gap: var(--s-4); max-width: var(--maxw); margin-inline: auto; }
+  .mobile-menu__links { display: grid; gap: var(--s-1); }
+  .mobile-link {
+    padding: var(--s-4) var(--s-3);
+    font-size: var(--fs-h3);
+    color: var(--ink);
+    border-block-end: 1px solid var(--line);
+  }
+  .mobile-link--active { color: var(--accent-ink); }
+  .mobile-menu__cta { justify-content: center; margin-block-start: var(--s-3); }
+
+  @media (min-width: 900px) {
+    .site-nav__links { display: flex; }
+    .site-nav__cta { display: inline-flex; }
+    .site-nav__burger { display: none; }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('[data-nav-toggle]');
+  const menu = document.querySelector('[data-nav-menu]') as HTMLElement | null;
+  const open = () => {
+    menu?.removeAttribute('hidden');
+    toggle?.setAttribute('aria-expanded', 'true');
+    toggle?.setAttribute('aria-label', 'إغلاق القائمة');
+  };
+  const close = () => {
+    menu?.setAttribute('hidden', '');
+    toggle?.setAttribute('aria-expanded', 'false');
+    toggle?.setAttribute('aria-label', 'فتح القائمة');
+  };
+  toggle?.addEventListener('click', () => {
+    toggle.getAttribute('aria-expanded') === 'true' ? close() : open();
+  });
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+</script>

@@ -1,0 +1,57 @@
+---
+import { methodology } from '@/data/methodology';
+---
+<section class="method section" aria-labelledby="method-title">
+  <div class="wrap">
+    <header class="method__head" data-reveal>
+      <h2 id="method-title" class="h2 thin">ستّ خطوات، من «لا أفهم» إلى «هذا سهل».</h2>
+      <p class="lead measure">الطريقة نفسها في كل درس. حين تعرف الخطوة التالية دائماً، يختفي القلق.</p>
+    </header>
+
+    <ol class="method__spine" role="list">
+      {methodology.map((st, i) => (
+        <li class="mstep" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+          <span class="mstep__node" aria-hidden="true"><span class="mstep__n num">{st.n}</span></span>
+          <div class="mstep__content">
+            <h3 class="mstep__title">{st.title}</h3>
+            <p class="mstep__body">{st.body}</p>
+            <p class="mstep__aside">{st.aside}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .method__head { max-width: 52ch; margin-block-end: var(--s-8); }
+  .method__spine { position: relative; display: grid; gap: var(--s-6); }
+  .method__spine::before {
+    content: '';
+    position: absolute;
+    inset-block: 1.2rem;
+    inset-inline-start: 1.1rem;
+    inline-size: 2px;
+    background-image: linear-gradient(var(--line-strong) 60%, transparent 0);
+    background-size: 2px 10px;
+    background-repeat: repeat-y;
+  }
+  .mstep { position: relative; display: grid; grid-template-columns: auto 1fr; gap: var(--s-5); align-items: start; }
+  .mstep__node {
+    position: relative; z-index: 1;
+    inline-size: 2.3rem; block-size: 2.3rem; border-radius: var(--r-pill);
+    background: var(--paper); border: 2px solid var(--accent);
+    display: grid; place-items: center;
+  }
+  .mstep__n { font-size: var(--fs-body); color: var(--accent-ink); }
+  .mstep__content { padding-block-start: 0.15rem; }
+  .mstep__title { font-size: var(--fs-h3); }
+  .mstep__body { margin-block-start: var(--s-2); color: var(--ink-2); max-width: 54ch; }
+  .mstep__aside { margin-block-start: var(--s-2); color: var(--accent-ink); font-size: var(--fs-small); }
+
+  @media (min-width: 820px) {
+    .method__spine { grid-template-columns: repeat(2, 1fr); gap: var(--s-8) var(--s-9); }
+    .method__spine::before { display: none; }
+    .mstep { padding-inline-start: 0; }
+  }
+</style>

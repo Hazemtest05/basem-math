@@ -116,6 +116,8 @@ import Icon from '@/components/Icon.astro';
     background: transparent;
     outline-offset: 6px;
     cursor: pointer;
+    /* force LTR geometry so the fill gradient + thumb stay aligned in the RTL page */
+    direction: ltr;
   }
   input[type='range'][data-hero-range]::-webkit-slider-runnable-track {
     block-size: 4px; border-radius: var(--r-pill);

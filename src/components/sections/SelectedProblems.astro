@@ -67,7 +67,7 @@ import Icon from '@/components/Icon.astro';
     inline-size: 1.7rem; block-size: 1.7rem; border-radius: var(--r-pill);
     background: var(--paper-2); color: var(--ink-2); display: grid; place-items: center; font-size: var(--fs-small);
   }
-  .prob__step-body { display: grid; gap: var(--s-1); }
+  .prob__step-body { display: grid; gap: var(--s-1); min-width: 0; overflow-x: auto; }
   .prob__step-note { color: var(--ink-2); font-size: var(--fs-small); }
   .prob__answer-lead { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ok); font-size: var(--fs-small); }
   .prob__answer-lead :global(.icon) { color: var(--ok); }

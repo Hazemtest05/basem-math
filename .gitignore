@@ -11,6 +11,8 @@ node_modules/
 # generated / temp
 *.log
 .tmp*
+.qc/
+.qc-*
 .DS_Store
 Thumbs.db
 

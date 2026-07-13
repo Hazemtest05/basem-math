@@ -133,8 +133,13 @@ for (let yv = Math.ceil(ymin); yv <= Math.floor(ymax); yv++) yticks.push(yv);
   .lesson__at { color: var(--ink-2); font-size: var(--fs-body); }
 
   .lesson__work { display: grid; grid-template-columns: 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+  /* let the grid columns shrink below their content's intrinsic width (the SVG),
+     otherwise the graph column blows the page wider than the mobile viewport */
+  .lesson__work > * { min-width: 0; }
 
-  .lesson__stage { position: sticky; top: 88px; }
+  /* the graph pins beside the panel ONLY on the desktop two-column layout;
+     on mobile (single column) it must scroll normally, not stay stuck on top */
+  .lesson__stage { position: static; }
   .lesson__svg { width: 100%; max-width: 420px; height: auto; margin-inline: auto; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--sh-1); }
   .lesson__control { margin-block-start: var(--s-4); max-width: 420px; margin-inline: auto; }
   .lesson__control-label { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); font-size: var(--fs-small); color: var(--ink-2); }
@@ -187,6 +192,7 @@ for (let yv = Math.ceil(ymin); yv <= Math.floor(ymax); yv++) yticks.push(yv);
 
   @media (min-width: 900px) {
     .lesson__work { grid-template-columns: 0.9fr 1.1fr; gap: clamp(2rem, 5vw, 4rem); }
+    .lesson__stage { position: sticky; top: 88px; }
   }
 </style>
 

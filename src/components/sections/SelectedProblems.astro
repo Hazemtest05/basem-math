@@ -61,21 +61,37 @@ import Icon from '@/components/Icon.astro';
   .prob__id { color: var(--ink-3); font-size: var(--fs-small); }
   .prob__title { font-size: var(--fs-h2); font-weight: var(--w-thin); }
   .prob__statement { margin-block-start: var(--s-3); color: var(--ink-2); }
-  .prob__steps { display: grid; gap: var(--s-4); margin-block: var(--s-5); }
-  .prob__step { display: grid; grid-template-columns: auto 1fr; gap: var(--s-4); align-items: start; }
+  /* each step is a math line + the reasoning behind it, separated by a hairline
+     so the eye groups "what we did" with "why". */
+  .prob__steps { display: grid; margin-block: var(--s-5); }
+  .prob__step { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3) var(--s-4); align-items: start; padding-block: var(--s-4); }
+  .prob__step + .prob__step { border-block-start: 1px solid var(--line); }
   .prob__step-n {
-    inline-size: 1.7rem; block-size: 1.7rem; border-radius: var(--r-pill);
-    background: var(--paper-2); color: var(--ink-2); display: grid; place-items: center; font-size: var(--fs-small);
+    inline-size: 1.9rem; block-size: 1.9rem; border-radius: var(--r-pill);
+    background: var(--accent-wash); color: var(--accent-ink); border: 1px solid var(--accent-wash-2);
+    display: grid; place-items: center; font-size: var(--fs-small); font-variant-numeric: tabular-nums;
   }
-  .prob__step-body { display: grid; gap: var(--s-1); min-width: 0; overflow-x: auto; }
-  .prob__step-note { color: var(--ink-2); font-size: var(--fs-small); }
-  .prob__answer-lead { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ok); font-size: var(--fs-small); }
+  .prob__step-body { display: grid; gap: var(--s-2); min-width: 0; }
+  /* only the math line scrolls if a formula is wider than the column, so the
+     reasoning note stays put and readable */
+  .prob__step-body :global(.math-host) { display: block; overflow-x: auto; overflow-y: hidden; }
+  .prob__step-body :global(.math) { font-size: 1.06em; }
+  /* the reasoning line, tagged with a small red-pen dash like the teacher's margin */
+  .prob__step-note { color: var(--ink-2); font-size: var(--fs-small); line-height: 1.65; }
+  .prob__step-note::before {
+    content: ''; display: inline-block; inline-size: 0.95rem; block-size: 2px;
+    background: var(--accent); vertical-align: middle; margin-inline-end: 0.5rem; transform: translateY(-0.14em);
+  }
+  .prob__answer-lead { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ok); font-size: var(--fs-small); margin-block-start: var(--s-2); }
   .prob__answer-lead :global(.icon) { color: var(--ok); }
   .prob__answer { display: block; }
   .prob__mistake { margin-block-start: var(--s-5); }
-  .prob__takeaway { margin-block-start: var(--s-5); color: var(--ink-2); }
-  .prob__takeaway-tag { display: inline-block; color: var(--ink); margin-inline-end: var(--s-2); }
-  .prob__takeaway-tag::after { content: ':'; }
+  /* the takeaway is the one line to remember: a soft recessed plate, not a card */
+  .prob__takeaway {
+    margin-block-start: var(--s-5); padding: var(--s-4) var(--s-5);
+    background: var(--paper-2); border-radius: var(--r-card); color: var(--ink); line-height: 1.7;
+  }
+  .prob__takeaway-tag { display: block; color: var(--accent-ink); font-size: var(--fs-small); margin-block-end: var(--s-1); }
   .prob__source { margin-block-start: var(--s-4); color: var(--ink-3); font-size: var(--fs-micro); }
 
   @media (min-width: 860px) {

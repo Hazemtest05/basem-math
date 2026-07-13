@@ -61,10 +61,12 @@ for (let yv = Math.ceil(ymin); yv <= Math.floor(ymax); yv++) yticks.push(yv);
 
           <!-- secant/tangent line (JS updates; SSR shows the tangent) -->
           <line data-line x1={X(tx0)} y1={Y(ty0)} x2={X(tx1)} y2={Y(ty1)} stroke="var(--accent)" stroke-width="2.4" stroke-dasharray="0" />
-          <!-- fixed point A and moving point B -->
+          <!-- fixed point A and moving point B. The A label sits above the point,
+               inside the open mouth of the parabola, with a paper halo so it never
+               collides with the curve, the tangent, or the moving point. -->
           <circle data-pa cx={X(aX)} cy={Y(aY)} r="5.5" fill="var(--ink)" />
           <circle data-pb cx={X(aX)} cy={Y(aY)} r="5" fill="var(--accent)" />
-          <text data-alabel x={X(aX) + 8} y={Y(aY) + 18} fill="var(--ink-2)" font-size="12">A(2, -2)</text>
+          <text data-alabel class="glabel" x={X(aX)} y={Y(aY) - 13} text-anchor="middle">A(2, -2)</text>
         </svg>
 
         <div class="lesson__control">
@@ -141,6 +143,16 @@ for (let yv = Math.ceil(ymin); yv <= Math.floor(ymax); yv++) yticks.push(yv);
      on mobile (single column) it must scroll normally, not stay stuck on top */
   .lesson__stage { position: static; }
   .lesson__svg { width: 100%; max-width: 420px; height: auto; margin-inline: auto; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--sh-1); }
+  /* SVG point labels: a paper halo (stroke painted behind the fill) keeps the
+     text readable wherever it lands over the grid or the curve. */
+  .lesson__svg .glabel {
+    fill: var(--ink-2);
+    font-size: 12px;
+    paint-order: stroke;
+    stroke: var(--raised);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
   .lesson__control { margin-block-start: var(--s-4); max-width: 420px; margin-inline: auto; }
   .lesson__control-label { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); font-size: var(--fs-small); color: var(--ink-2); }
   .lesson__slope { color: var(--accent-ink); font-variant-numeric: tabular-nums; }

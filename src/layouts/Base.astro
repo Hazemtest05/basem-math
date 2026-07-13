@@ -106,6 +106,12 @@ const jsonLd = {
 
     <Footer />
 
+    <button type="button" class="to-top no-print" data-to-top aria-label="العودة إلى الأعلى">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 19V5" /><path d="M6 11l6-6 6 6" />
+      </svg>
+    </button>
+
     {import.meta.env.DEV && usingPlaceholders && (
       <div class="dev-banner no-print" role="note">
         بيانات تجريبية. راجع <code>src/config/teacher.ts</code> قبل النشر.
@@ -135,6 +141,33 @@ const jsonLd = {
       }
       .dev-banner code { color: var(--accent-bright); }
       .dev-banner button { color: var(--chalk-2); font-size: 0.9em; }
+
+      /* back-to-top: appears after the student scrolls into a long page, so
+         returning to the menu is one tap instead of a long thumb-drag. */
+      .to-top {
+        position: fixed;
+        inset-block-end: var(--s-5);
+        inset-inline-end: var(--s-5);
+        z-index: var(--z-nav);
+        inline-size: 44px;
+        block-size: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: var(--r-pill);
+        background: var(--raised);
+        color: var(--ink);
+        border: 1px solid var(--line-strong);
+        box-shadow: var(--sh-2);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease),
+          visibility var(--dur-2), background var(--dur-1) var(--ease), border-color var(--dur-1);
+      }
+      .to-top.is-visible { opacity: 1; visibility: visible; transform: none; }
+      .to-top:hover { background: var(--paper); border-color: var(--accent); color: var(--accent-ink); }
+      .to-top:active { transform: scale(0.94); }
+      @media (pointer: coarse) { .to-top { inline-size: 48px; block-size: 48px; inset-block-end: var(--s-4); } }
     </style>
 
     <!-- scroll-reveal: cheap IntersectionObserver, no scroll listeners -->
@@ -156,6 +189,21 @@ const jsonLd = {
       }
       const dismiss = document.querySelector('[data-dev-dismiss]');
       dismiss?.addEventListener('click', (e) => (e.currentTarget as HTMLElement).closest('.dev-banner')?.remove());
+
+      // back-to-top: reveal past one viewport of scroll, smooth-scroll on tap
+      const toTop = document.querySelector('[data-to-top]');
+      if (toTop) {
+        const onScroll = () => {
+          const y = document.documentElement.scrollTop || document.body.scrollTop;
+          toTop.classList.toggle('is-visible', y > window.innerHeight * 0.9);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        toTop.addEventListener('click', () => {
+          const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        });
+      }
     </script>
   </body>
 </html>

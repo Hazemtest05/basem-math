@@ -125,7 +125,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  /* Guard against stray horizontal overflow WITHOUT making <body> a scroll
+     container. `overflow-x: hidden` here computes overflow-y to `auto`, which
+     turns body into a scroll container and silently breaks `position: sticky`
+     on the nav (it scrolls away). `clip` clips the same way but establishes no
+     scrollport, so the sticky header keeps working. */
+  overflow-x: clip;
 }
 
 img, svg, video, canvas { display: block; max-width: 100%; }

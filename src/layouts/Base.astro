@@ -168,6 +168,9 @@ const jsonLd = {
       .to-top:hover { background: var(--paper); border-color: var(--accent); color: var(--accent-ink); }
       .to-top:active { transform: scale(0.94); }
       @media (pointer: coarse) { .to-top { inline-size: 48px; block-size: 48px; inset-block-end: var(--s-4); } }
+      /* on mobile the bottom tab bar owns this zone: tapping the active tab
+         scrolls to top instead, so the floating button is desktop-only */
+      @media (max-width: 899px) { .to-top { display: none; } }
     </style>
 
     <!-- scroll-reveal: cheap IntersectionObserver, no scroll listeners -->

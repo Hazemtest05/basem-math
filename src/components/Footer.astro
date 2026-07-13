@@ -83,6 +83,10 @@ const year = 2026; // static build stamp; update per release
     .foot__brand { grid-column: 1; }
   }
 
+  /* leave room under the footer so the floating bottom tab bar never covers the
+     last line (the dark surface simply extends behind the bar) */
+  @media (max-width: 899px) { .foot { padding-block-end: calc(var(--s-6) + 84px); } }
+
   /* touch: the footer link lists are the densest tap zone on the page. Give each
      link a full 44px target and a touch more row spacing so thumbs don't misfire. */
   @media (pointer: coarse) {

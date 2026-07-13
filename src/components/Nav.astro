@@ -5,6 +5,15 @@ import Icon from '@/components/Icon.astro';
 interface Props { page?: string; }
 const { page = '/' } = Astro.props;
 const isActive = (href: string) => (href === '/' ? page === '/' : page.startsWith(href));
+
+/* mobile bottom tab bar: the core learning journey, one thumb-tap away.
+   Kept to four so the floating bar breathes; the burger still holds the full index. */
+const tabs = [
+  { href: '/', label: 'البداية', icon: 'home' },
+  { href: '/curriculum', label: 'المنهاج', icon: 'grid' },
+  { href: '/lessons', label: 'الدروس', icon: 'curve' },
+  { href: '/contact', label: 'تواصل', icon: 'chat' },
+] as const;
 ---
 <header class="site-nav" data-nav>
   <div class="wrap site-nav__row">
@@ -53,6 +62,21 @@ const isActive = (href: string) => (href === '/' ? page === '/' : page.startsWit
        far through a lesson they are. Fills from the right (start of the RTL line). -->
   <div class="nav-progress" aria-hidden="true"><span class="nav-progress__fill" data-nav-progress></span></div>
 </header>
+
+<!-- mobile bottom tab bar: primary destinations one thumb-tap away. The current
+     tab lifts into an accent notch. Hidden from 900px up (desktop uses the top nav). -->
+<nav class="tabbar no-print" aria-label="روابط سريعة">
+  {tabs.map((t) => (
+    <a
+      href={t.href}
+      class:list={['tab', { 'tab--active': isActive(t.href) }]}
+      aria-current={isActive(t.href) ? 'page' : undefined}
+    >
+      <span class="tab__icon"><Icon name={t.icon} size={22} /></span>
+      <span class="tab__label">{t.label}</span>
+    </a>
+  ))}
+</nav>
 
 <style>
   .site-nav {
@@ -134,10 +158,61 @@ const isActive = (href: string) => (href === '/' ? page === '/' : page.startsWit
   }
   @media (prefers-reduced-motion: reduce) { .nav-progress__fill { transition: none; } }
 
+  /* ===== mobile bottom tab bar ===== */
+  .tabbar {
+    position: fixed;
+    inset-inline: var(--s-4);
+    inset-block-end: var(--s-4);
+    z-index: var(--z-nav);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-items: center;
+    gap: var(--s-1);
+    padding: var(--s-2) var(--s-3);
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    box-shadow: var(--sh-3);
+  }
+  .tab {
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    padding-block: var(--s-1);
+    min-block-size: 48px;
+    color: var(--ink-3);
+    transition: color var(--dur-1) var(--ease);
+  }
+  .tab__icon {
+    display: grid;
+    place-items: center;
+    inline-size: 38px;
+    block-size: 38px;
+    border-radius: var(--r-pill);
+    transition: transform var(--dur-2) var(--ease), background var(--dur-2) var(--ease),
+      color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+  }
+  .tab__label { font-size: var(--fs-micro); line-height: 1; }
+  .tab--active { color: var(--accent-ink); }
+  .tab--active .tab__icon {
+    transform: translateY(-18px);
+    background: var(--accent);
+    color: #fff;
+    /* accent glow + a solid paper ring that reads as a notch cut into the bar */
+    box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--accent) 55%, transparent),
+      0 0 0 6px var(--paper);
+  }
+  .tab:active .tab__icon { transform: translateY(-18px) scale(0.94); }
+  @media (prefers-reduced-motion: reduce) {
+    .tab--active .tab__icon, .tab:active .tab__icon { transform: translateY(-14px); }
+  }
+
   @media (min-width: 900px) {
     .site-nav__links { display: flex; }
     .site-nav__cta { display: inline-flex; }
     .site-nav__burger { display: none; }
+    .tabbar { display: none; }
   }
 </style>
 
@@ -176,4 +251,12 @@ const isActive = (href: string) => (href === '/' ? page === '/' : page.startsWit
     window.addEventListener('resize', onScroll, { passive: true });
     update();
   }
+
+  // tab bar: tapping the tab you're already on scrolls back to the top (app-style)
+  const activeTab = document.querySelector('.tabbar .tab--active');
+  activeTab?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
 </script>

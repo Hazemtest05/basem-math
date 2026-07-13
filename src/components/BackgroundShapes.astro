@@ -1,11 +1,11 @@
 ---
 /* Native Astro port of the "background shapes" idea: a weighted-random grid of
-   little geometric marks (dot / parallel lines / cross / square / diagonal) that
-   subtly morph over time. Rebuilt in the site's palette (faint ink + occasional
-   red pen on paper) instead of the demo's blue+white, and density-faded toward
-   the centre so it never competes with the text. Marks render at BUILD TIME
-   (seeded => deterministic, works with zero JS); the optional script only adds
-   the gentle "shapes change" animation, and is skipped under reduced motion. */
+   little geometric marks (dot / parallel lines / cross / square / diagonal).
+   Rebuilt in the site's palette (faint ink + occasional red pen on paper) instead
+   of the demo's blue+white, and density-faded toward the centre so it never
+   competes with the text. Deliberately STATIC (no perpetual motion): this is a
+   study site for anxious learners, so the background stays a calm notebook texture.
+   Rendered once at BUILD TIME (seeded => deterministic, zero JS, zero runtime cost). */
 const W = 1440, H = 900, CELL = 60;
 
 // deterministic seeded PRNG so server + client agree and the pattern is stable
@@ -39,9 +39,7 @@ for (let x = 0; x < W; x += CELL) {
     const accent = rand() < 0.12;
     const c = accent ? 'var(--accent)' : 'var(--ink)';
     const op = accent ? 0.12 : 0.07;
-    cells.push(
-      `<g class="bsh" data-cell data-x="${x}" data-y="${y}" data-c="${accent ? 'a' : 'i'}" data-op="${op}" style="opacity:${op}">${mark(shape, x, y, c)}</g>`
-    );
+    cells.push(`<g style="opacity:${op}">${mark(shape, x, y, c)}</g>`);
   }
 }
 const svg = cells.join('');
@@ -62,40 +60,4 @@ const svg = cells.join('');
             mask-image: radial-gradient(120% 90% at 50% 45%, transparent 34%, #000 78%, transparent 100%);
   }
   .bg-shapes svg { width: 100%; height: 100%; display: block; }
-  .bg-shapes .bsh { transition: opacity 0.9s var(--ease); }
-  @media (prefers-reduced-motion: reduce) { .bg-shapes .bsh { transition: none; } }
 </style>
-
-<script>
-  const layer = document.querySelector('.bg-shapes');
-  if (layer && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const CELL = 60;
-    const SHAPES = ['dot', 'lines', 'cross', 'square', 'diag'];
-    const cells = Array.from(layer.querySelectorAll<SVGGElement>('[data-cell]'));
-    const draw = (g: SVGGElement) => {
-      const x = +g.dataset.x!, y = +g.dataset.y!;
-      const c = g.dataset.c === 'a' ? 'var(--accent)' : 'var(--ink)';
-      const cx = x + CELL / 2, cy = y + CELL / 2;
-      const a = x + CELL * 0.28, b = x + CELL * 0.72, t = y + CELL * 0.28, d = y + CELL * 0.72;
-      const ln = (x1: number, y1: number, x2: number, y2: number) =>
-        `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="2"/>`;
-      const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-      g.innerHTML =
-        shape === 'dot' ? `<circle cx="${cx}" cy="${cy}" r="${CELL * 0.09}" fill="${c}"/>`
-        : shape === 'lines' ? ln(a, t, b, t) + ln(a, cy, b, cy) + ln(a, d, b, d)
-        : shape === 'cross' ? ln(a, t, b, d) + ln(a, d, b, t)
-        : shape === 'square' ? `<rect x="${a}" y="${t}" width="${b - a}" height="${d - t}" fill="none" stroke="${c}" stroke-width="2"/>`
-        : ln(a, d, b, t);
-    };
-    const tick = () => {
-      for (let n = 0; n < 2; n++) {
-        const g = cells[Math.floor(Math.random() * cells.length)];
-        if (!g) continue;
-        g.style.opacity = '0';
-        setTimeout(() => { draw(g); g.style.opacity = g.dataset.op!; }, 450);
-      }
-      setTimeout(tick, 2600 + Math.random() * 1800);
-    };
-    setTimeout(tick, 1600);
-  }
-</script>

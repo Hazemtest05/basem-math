@@ -1,0 +1,150 @@
+---
+/* Function grapher tool. Type f(x) → the curve is drawn (safe parser, no eval).
+   The SVG is populated by src/lib/grapher.ts on load; without JS it stays an
+   empty, harmless stage. */
+---
+<div class="grapher" data-grapher>
+  <div class="grapher__head">
+    <span class="grapher__badge">أداة الرسم</span>
+    <h3 class="grapher__title">ارسم أيّ تابع</h3>
+    <p class="grapher__prompt">
+      اكتب تابعاً بدلالة <span class="ltr">x</span> — مثل
+      <code class="ltr">x^2 - 3x</code> أو <code class="ltr">sin(x)</code> أو
+      <code class="ltr">e^x</code> — وسيُرسم فوراً. لرسم أكثر من تابع افصل بينها
+      بفاصلة منقوطة <span class="ltr">(;)</span>.
+    </p>
+  </div>
+
+  <div class="grapher__bar">
+    <span class="grapher__fx ltr" aria-hidden="true">f(x) =</span>
+    <input
+      class="grapher__input ltr"
+      data-grapher-input
+      type="text"
+      inputmode="text"
+      dir="ltr"
+      spellcheck="false"
+      autocomplete="off"
+      autocapitalize="off"
+      value="x^2 - 3x"
+      aria-label="التابع المراد رسمه بدلالة x"
+    />
+  </div>
+  <p class="grapher__error ltr" data-grapher-error role="alert"></p>
+
+  <div class="grapher__stage">
+    <svg data-grapher-svg viewBox="0 0 600 380" role="img" aria-label="مخطّط التابع"></svg>
+    <div class="grapher__zoom" role="group" aria-label="تكبير وتصغير">
+      <button type="button" data-grapher-action="out" aria-label="تصغير">−</button>
+      <button type="button" data-grapher-action="reset" aria-label="إعادة الضبط">⟳</button>
+      <button type="button" data-grapher-action="in" aria-label="تكبير">+</button>
+    </div>
+  </div>
+
+  <p class="grapher__readout" data-grapher-readout aria-live="polite"></p>
+</div>
+
+<style>
+  .grapher {
+    padding: var(--s-5);
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+  .grapher__badge {
+    display: inline-block;
+    font-size: var(--fs-micro);
+    color: var(--accent-ink);
+    border: 1px solid var(--accent-wash-2);
+    background: var(--accent-wash);
+    padding: 0.2em 0.7em;
+    border-radius: var(--r-pill);
+    margin-block-end: var(--s-3);
+  }
+  .grapher__title { font-size: var(--fs-h3); }
+  .grapher__prompt { margin-block-start: var(--s-2); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.7; max-width: 56ch; }
+  .grapher__prompt code { background: var(--raised); border: 1px solid var(--line); border-radius: 5px; padding: 0.05em 0.4em; font-size: 0.95em; }
+
+  .grapher__bar {
+    display: flex; align-items: stretch; gap: var(--s-2);
+    margin-block-start: var(--s-5);
+  }
+  .grapher__fx {
+    display: grid; place-items: center;
+    padding-inline: var(--s-3);
+    color: var(--accent-ink);
+    background: var(--raised);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-control);
+    font-size: var(--fs-small);
+    white-space: nowrap;
+  }
+  .grapher__input {
+    flex: 1 1 auto; min-width: 0;
+    padding: 0.7em 0.9em;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-control);
+    background: var(--raised);
+    color: var(--ink);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+  .grapher__input:focus-visible { border-color: var(--accent); outline-offset: 1px; }
+  .grapher__error { min-height: 1.2em; margin-block-start: var(--s-2); color: var(--accent-ink); font-size: var(--fs-small); }
+
+  .grapher__stage { position: relative; margin-block-start: var(--s-3); }
+  .grapher__stage svg {
+    inline-size: 100%; block-size: auto; display: block;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+    touch-action: pan-y; /* let vertical page scroll through the stage on touch */
+  }
+  .grapher__zoom {
+    position: absolute;
+    inset-block-start: var(--s-3);
+    inset-inline-end: var(--s-3);
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    background: color-mix(in srgb, var(--raised) 88%, transparent);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    backdrop-filter: blur(4px);
+  }
+  .grapher__zoom button {
+    inline-size: 30px; block-size: 30px;
+    display: grid; place-items: center;
+    border-radius: var(--r-pill);
+    color: var(--ink);
+    font-size: 1.1rem; line-height: 1;
+    transition: background var(--dur-1) var(--ease), color var(--dur-1);
+  }
+  .grapher__zoom button:hover { background: var(--paper-2); color: var(--accent-ink); }
+  .grapher__zoom button:active { transform: scale(0.92); }
+
+  .grapher__readout {
+    margin-block-start: var(--s-4);
+    padding: var(--s-3) var(--s-4);
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+    color: var(--ink);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    min-block-size: 3em;
+    unicode-bidi: plaintext;
+  }
+
+  @media (pointer: coarse) {
+    .grapher__zoom button { inline-size: 38px; block-size: 38px; }
+  }
+</style>
+
+<script>
+  import { initGraphers } from '@/lib/grapher';
+  const run = () => initGraphers();
+  if (document.readyState !== 'loading') run();
+  else document.addEventListener('DOMContentLoaded', run);
+  document.addEventListener('astro:page-load', run);
+</script>

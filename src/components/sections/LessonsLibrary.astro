@@ -1,0 +1,148 @@
+---
+/* The interactive lessons library: all 57 lessons, each with its own hands-on
+   widget. Master–detail — a units/lessons rail (native <details> accordions) plus
+   a panel that shows the active lesson. Only the open lesson's widget is mounted
+   (lazy), so the page stays light. */
+import { lessonUnits, allLessonTools, lessonCount } from '@/data/lessonTools';
+const first = allLessonTools[0].type;
+// a stable running lesson number within each unit for the eyebrow
+---
+<section class="lib section" aria-labelledby="lib-title">
+  <div class="wrap">
+    <header class="lib__head" data-reveal>
+      <p class="eyebrow">مختبر الدروس</p>
+      <h2 id="lib-title" class="h2 thin">كلّ درسٍ بأداةٍ تفاعلية خاصّة به.</h2>
+      <p class="lead measure">اختر درساً من الفهرس وجرّبه بيدك: اسحب، حرّك المؤشّرات، وراقب الفكرة تتحرّك. <span class="num">{lessonCount}</span> درساً تفاعلياً عبر <span class="num">{lessonUnits.length}</span> وحدات.</p>
+    </header>
+
+    <div class="lib__layout" data-lib data-default={first}>
+      <!-- RAIL -->
+      <nav class="lib__rail" aria-label="فهرس الدروس">
+        {lessonUnits.map((u, ui) => (
+          <details class="lib__unit" open={ui === 0}>
+            <summary class="lib__unit-sum">
+              <span class="lib__unit-book">{u.book === 1 ? 'ك١' : 'ك٢'}</span>
+              <span class="lib__unit-title">{u.unitNo}. {u.unitTitle}</span>
+              <span class="lib__unit-count num">{u.lessons.length}</span>
+            </summary>
+            <ul role="list" class="lib__lessons">
+              {u.lessons.map((l, li) => (
+                <li>
+                  <a class="lib__link" href={`#${l.type}`} data-lesson-tab={l.type}>
+                    <span class="lib__link-n num">{u.unitNo}.{li + 1}</span>
+                    <span class="lib__link-title">{l.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ))}
+      </nav>
+
+      <!-- PANEL -->
+      <div class="lib__panel">
+        {lessonUnits.map((u) => u.lessons.map((l, li) => (
+          <article class="lesson" id={l.type} data-lesson-detail={l.type} tabindex="-1" hidden>
+            <p class="lesson__meta">
+              <span class="num">{u.book === 1 ? 'الكتاب الأول' : 'الكتاب الثاني'} · وحدة {u.unitNo} · درس {li + 1}</span>
+            </p>
+            <h3 class="lesson__title thin">{l.title}</h3>
+            <p class="lesson__prompt">{l.prompt}</p>
+
+            <div class="lesson__demo" data-lesson={l.type}>
+              <div class="demo__grid">
+                <div class="demo__stage">
+                  <svg data-demo-svg viewBox="0 0 380 270" role="img" aria-label={l.title}></svg>
+                </div>
+                <div class="demo__side">
+                  <div class="demo__controls" data-demo-controls></div>
+                  <p class="demo__readout" data-demo-readout></p>
+                </div>
+              </div>
+            </div>
+          </article>
+        )))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lib__head { max-width: 60ch; margin-block-end: var(--s-7); }
+  .lib__layout { display: grid; grid-template-columns: 1fr; gap: var(--s-6); }
+
+  /* rail */
+  .lib__unit { border: 1px solid var(--line); border-radius: var(--r-control); background: var(--raised); overflow: hidden; }
+  .lib__unit + .lib__unit { margin-block-start: var(--s-2); }
+  .lib__unit-sum {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--s-3);
+    padding: var(--s-3) var(--s-4); cursor: pointer; list-style: none; user-select: none;
+  }
+  .lib__unit-sum::-webkit-details-marker { display: none; }
+  .lib__unit-sum:hover { background: var(--paper-2); }
+  .lib__unit-book { font-size: var(--fs-micro); color: var(--accent-ink); border: 1px solid var(--accent-wash-2); background: var(--accent-wash); border-radius: var(--r-pill); padding: 0.15em 0.5em; }
+  .lib__unit-title { font-size: var(--fs-small); color: var(--ink); }
+  .lib__unit-count { color: var(--ink-3); font-size: var(--fs-small); }
+  .lib__lessons { display: grid; gap: 1px; padding: 0 var(--s-2) var(--s-2); }
+  .lib__link {
+    display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: var(--s-3);
+    padding: var(--s-2) var(--s-3); border-radius: var(--r-control); color: var(--ink-2);
+    border: 1px solid transparent; transition: background var(--dur-1) var(--ease), color var(--dur-1);
+  }
+  .lib__link:hover { background: var(--paper-2); color: var(--ink); }
+  .lib__link.is-active { background: var(--accent-wash); border-color: var(--accent-wash-2); color: var(--accent-ink); }
+  .lib__link-n { color: var(--ink-3); font-size: var(--fs-micro); }
+  .lib__link.is-active .lib__link-n { color: var(--accent-ink); }
+  .lib__link-title { font-size: var(--fs-small); }
+
+  /* panel */
+  .lesson {
+    padding: clamp(1.25rem, 4vw, 2.25rem);
+    background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-card);
+    scroll-margin-top: 88px;
+  }
+  .lesson:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; }
+  .lesson__meta { color: var(--ink-3); font-size: var(--fs-small); }
+  .lesson__title { font-size: var(--fs-h3); margin-block-start: var(--s-2); }
+  .lesson__prompt { margin-block: var(--s-3) var(--s-5); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.7; max-width: 60ch; }
+
+  @media (min-width: 1040px) {
+    .lib__layout { grid-template-columns: 320px 1fr; gap: var(--s-7); align-items: start; }
+    .lib__rail { position: sticky; top: 88px; max-height: calc(100dvh - 108px); overflow-y: auto; padding-inline-end: var(--s-2); }
+  }
+</style>
+
+<script>
+  import { initLessonInteractives } from '@/lib/lessonInteractives';
+
+  const root = document.querySelector('[data-lib]') as HTMLElement | null;
+  if (root) {
+    const details = Array.from(root.querySelectorAll('[data-lesson-detail]')) as HTMLElement[];
+    const tabs = Array.from(root.querySelectorAll('[data-lesson-tab]')) as HTMLAnchorElement[];
+
+    const setActive = (slug: string, focus = false): void => {
+      const target = details.some((d) => d.id === slug) ? slug : root.dataset.default!;
+      details.forEach((d) => (d.hidden = d.id !== target));
+      tabs.forEach((t) => t.classList.toggle('is-active', t.getAttribute('data-lesson-tab') === target));
+      // open the accordion holding the active lesson
+      const tab = tabs.find((t) => t.getAttribute('data-lesson-tab') === target);
+      const acc = tab?.closest('details') as HTMLDetailsElement | null;
+      if (acc && !acc.open) acc.open = true;
+      // mount the now-visible widget
+      initLessonInteractives();
+      if (focus) document.getElementById(target)?.focus({ preventScroll: true });
+    };
+
+    tabs.forEach((t) =>
+      t.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slug = t.getAttribute('data-lesson-tab')!;
+        history.replaceState(null, '', '#' + slug);
+        setActive(slug, true);
+      })
+    );
+
+    window.addEventListener('hashchange', () => setActive((location.hash || '#' + root.dataset.default).slice(1)));
+    setActive((location.hash || '#' + root.dataset.default).slice(1));
+  }
+</script>

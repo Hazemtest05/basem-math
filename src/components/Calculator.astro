@@ -1,0 +1,193 @@
+---
+/* Calculator tool. A normal keypad (works with mouse, touch, and keyboard) wired
+   by src/lib/calculator.ts. It quietly hides a secret: pressing "=" on 1+1 or 2+2
+   reveals a downloadable book. No hint of this appears on screen. */
+import Icon from '@/components/Icon.astro';
+import { books } from '@/config/downloads';
+
+interface Key { label: string; key: string; kind: 'num' | 'op' | 'fn' | 'const' | 'eq'; span?: number; }
+const keys: Key[] = [
+  { label: 'C', key: 'clear', kind: 'fn' },
+  { label: '⌫', key: 'back', kind: 'fn' },
+  { label: '(', key: '(', kind: 'op' },
+  { label: ')', key: ')', kind: 'op' },
+  { label: '7', key: '7', kind: 'num' },
+  { label: '8', key: '8', kind: 'num' },
+  { label: '9', key: '9', kind: 'num' },
+  { label: '÷', key: '/', kind: 'op' },
+  { label: '4', key: '4', kind: 'num' },
+  { label: '5', key: '5', kind: 'num' },
+  { label: '6', key: '6', kind: 'num' },
+  { label: '×', key: '*', kind: 'op' },
+  { label: '1', key: '1', kind: 'num' },
+  { label: '2', key: '2', kind: 'num' },
+  { label: '3', key: '3', kind: 'num' },
+  { label: '−', key: '-', kind: 'op' },
+  { label: '0', key: '0', kind: 'num' },
+  { label: '.', key: '.', kind: 'num' },
+  { label: '^', key: '^', kind: 'op' },
+  { label: '+', key: '+', kind: 'op' },
+  { label: 'π', key: 'pi', kind: 'const' },
+  { label: '√', key: 'sqrt(', kind: 'const' },
+  { label: '=', key: 'equals', kind: 'eq', span: 2 },
+];
+---
+<div class="calc" data-calc tabindex="0" aria-label="آلة حاسبة">
+  <div class="calc__head">
+    <span class="calc__badge">آلة حاسبة</span>
+    <h3 class="calc__title">احسب بسرعة</h3>
+    <p class="calc__prompt">جمع، طرح، ضرب، قسمة، أقواس، قوى (<span class="ltr">^</span>) وجذور. يمكنك الكتابة بلوحة المفاتيح أيضاً.</p>
+  </div>
+
+  <div class="calc__screen">
+    <div class="calc__expr ltr" data-calc-expr aria-live="off">0</div>
+    <div class="calc__result ltr" data-calc-result aria-live="polite"></div>
+  </div>
+
+  <div class="calc__pad">
+    {keys.map((k) => (
+      <button
+        type="button"
+        class:list={['calc__key', `calc__key--${k.kind}`, { 'calc__key--wide': k.span === 2 }]}
+        data-key={k.key}
+        aria-label={k.key === 'back' ? 'حذف' : k.key === 'clear' ? 'مسح' : k.key === 'equals' ? 'يساوي' : k.label}
+      >{k.label}</button>
+    ))}
+  </div>
+
+  <!-- the secret: hidden until 1+1 / 2+2 is entered -->
+  <div class="calc__books" data-calc-books hidden>
+    {books.map((b) => (
+      <article class="bookcard" data-book={b.id} hidden>
+        <span class="bookcard__spark" aria-hidden="true">🎁</span>
+        <div class="bookcard__cover" aria-hidden="true">
+          <svg viewBox="0 0 48 60" fill="none">
+            <rect x="4" y="3" width="40" height="54" rx="4" fill="var(--paper-2)" stroke="var(--accent)" stroke-width="1.6" />
+            <line x1="12" y1="3" x2="12" y2="57" stroke="var(--accent)" stroke-width="1.2" opacity="0.5" />
+            <path d="M20 20 C 26 20, 26 34, 32 34" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div class="bookcard__body">
+          <p class="bookcard__found">لقد وجدت كتاباً مخبّأً!</p>
+          <h4 class="bookcard__title">{b.titleAr}</h4>
+          <p class="bookcard__sub">{b.subtitleAr}</p>
+          <p class="bookcard__meta ltr">{b.meta}</p>
+          <a class="btn btn--accent bookcard__dl" href={b.href} download>
+            <Icon name="download" size={18} /> تحميل الكتاب
+          </a>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>
+
+<style>
+  .calc {
+    padding: var(--s-5);
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+  .calc:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; }
+  .calc__badge {
+    display: inline-block;
+    font-size: var(--fs-micro);
+    color: var(--accent-ink);
+    border: 1px solid var(--accent-wash-2);
+    background: var(--accent-wash);
+    padding: 0.2em 0.7em;
+    border-radius: var(--r-pill);
+    margin-block-end: var(--s-3);
+  }
+  .calc__title { font-size: var(--fs-h3); }
+  .calc__prompt { margin-block-start: var(--s-2); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.6; }
+
+  .calc__screen {
+    margin-block-start: var(--s-5);
+    padding: var(--s-4) var(--s-5);
+    background: var(--board);
+    border-radius: var(--r-control);
+    min-block-size: 5.2rem;
+    display: grid;
+    align-content: center;
+    gap: var(--s-1);
+    overflow: hidden;
+  }
+  .calc__expr {
+    color: var(--chalk);
+    font-size: 1.35rem;
+    line-height: 1.3;
+    text-align: end;
+    word-break: break-all;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc__result {
+    color: var(--chalk-2);
+    font-size: var(--fs-small);
+    text-align: end;
+    min-block-size: 1.2em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .calc__pad {
+    margin-block-start: var(--s-4);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-2);
+  }
+  .calc__key {
+    padding-block: 0.7em;
+    border-radius: var(--r-control);
+    background: var(--raised);
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    font-size: 1.05rem;
+    line-height: 1;
+    min-block-size: 46px;
+    transition: background var(--dur-1) var(--ease), border-color var(--dur-1), transform var(--dur-1) var(--ease);
+  }
+  .calc__key:hover { background: var(--paper); border-color: var(--accent); }
+  .calc__key:active { transform: scale(0.95); }
+  .calc__key--op { color: var(--accent-ink); }
+  .calc__key--const { color: var(--ink-2); }
+  .calc__key--fn { background: var(--paper-2); color: var(--ink-2); }
+  .calc__key--eq { background: var(--accent); color: #fff; border-color: transparent; }
+  .calc__key--eq:hover { background: var(--accent-bright); border-color: transparent; }
+  .calc__key--wide { grid-column: span 2; }
+
+  /* the secret cards */
+  .calc__books { margin-block-start: var(--s-5); }
+  .bookcard {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-4);
+    align-items: center;
+    padding: var(--s-5);
+    background: var(--raised);
+    border: 1px solid var(--accent-wash-2);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-2);
+  }
+  .bookcard.is-revealed { animation: bookIn var(--dur-3) var(--ease) both; }
+  @keyframes bookIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+  .bookcard__spark { position: absolute; inset-block-start: var(--s-3); inset-inline-end: var(--s-4); font-size: 1.1rem; }
+  .bookcard__cover svg { inline-size: 54px; block-size: auto; }
+  .bookcard__found { color: var(--accent-ink); font-size: var(--fs-small); }
+  .bookcard__title { margin-block-start: var(--s-1); font-size: var(--fs-h3); font-weight: var(--w-reg); line-height: 1.3; }
+  .bookcard__sub { margin-block-start: var(--s-2); color: var(--ink-2); font-size: var(--fs-small); }
+  .bookcard__meta { margin-block-start: var(--s-1); color: var(--ink-3); font-size: var(--fs-micro); }
+  .bookcard__dl { margin-block-start: var(--s-4); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bookcard.is-revealed { animation: none; }
+  }
+</style>
+
+<script>
+  import { initCalculators } from '@/lib/calculator';
+  const run = () => initCalculators();
+  if (document.readyState !== 'loading') run();
+  else document.addEventListener('DOMContentLoaded', run);
+  document.addEventListener('astro:page-load', run);
+</script>

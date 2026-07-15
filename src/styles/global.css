@@ -396,6 +396,22 @@ p { text-wrap: pretty; }
 }
 .demo__btn:hover { background: var(--paper); border-color: var(--accent); color: var(--accent-ink); }
 .demo__btn:active, .demo__seg-btn:active { transform: scale(0.96); }
+.demo__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* checkbox control */
+.demo__check { display: flex; align-items: center; gap: var(--s-3); font-size: var(--fs-small); color: var(--ink-2); cursor: pointer; }
+.demo__check input { inline-size: 18px; block-size: 18px; accent-color: var(--accent); cursor: pointer; }
+
+/* prev/next stepper */
+.demo__stepper { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+.demo__stepper-cap { color: var(--accent-ink); font-size: var(--fs-small); white-space: nowrap; }
+
+/* numeric table (e.g. approaching a limit) */
+.demo__table { inline-size: 100%; border-collapse: collapse; font-size: var(--fs-small); font-variant-numeric: tabular-nums; direction: ltr; }
+.demo__table caption { caption-side: top; color: var(--ink-2); font-size: var(--fs-small); margin-block-end: var(--s-2); direction: rtl; }
+.demo__table th, .demo__table td { padding: 0.3em 0.55em; border: 1px solid var(--line); text-align: center; }
+.demo__table th { color: var(--ink-3); font-weight: var(--w-reg); }
+.demo__table .is-hl { background: var(--accent-wash); color: var(--accent-ink); }
 
 /* moving parts glide instead of snapping when a slider changes (never during a
    drag: draggable handles aren't marked .glide). Off under reduced motion. */

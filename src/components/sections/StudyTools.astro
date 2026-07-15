@@ -1,0 +1,32 @@
+---
+/* Study-tools band for /lessons: a function grapher (works for every lesson) and
+   a calculator. Both are progressive-enhancement islands. */
+import FunctionGrapher from '@/components/FunctionGrapher.astro';
+import Calculator from '@/components/Calculator.astro';
+---
+<section class="tools section" aria-labelledby="tools-title">
+  <div class="wrap">
+    <header class="tools__head" data-reveal>
+      <p class="eyebrow">أدوات تفاعلية</p>
+      <h2 id="tools-title" class="h2 thin">جرّبها بنفسك: ارسم، واحسب.</h2>
+      <p class="lead measure">أدواتٌ سريعة لكل درس. ارسم أيّ تابع لتفهم شكله، أو استعمل الحاسبة للتحقّق من خطواتك.</p>
+    </header>
+
+    <div class="tools__grid">
+      <div class="tools__cell tools__cell--wide" data-reveal>
+        <FunctionGrapher />
+      </div>
+      <div class="tools__cell" data-reveal style="--reveal-delay: 80ms">
+        <Calculator />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tools__head { max-width: 54ch; margin-block-end: var(--s-7); }
+  .tools__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-5); align-items: start; }
+  @media (min-width: 960px) {
+    .tools__grid { grid-template-columns: 1.5fr 1fr; gap: var(--s-6); }
+  }
+</style>

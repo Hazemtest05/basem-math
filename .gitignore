@@ -22,3 +22,9 @@ Thumbs.db
 
 # book PDFs — exceed GitHub's 100MB file limit; host on the web host / CDN, not git
 public/downloads/*.pdf
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

@@ -130,7 +130,16 @@ const first = allLessonTools[0].type;
       if (acc && !acc.open) acc.open = true;
       // mount the now-visible widget
       initLessonInteractives();
-      if (focus) document.getElementById(target)?.focus({ preventScroll: true });
+      if (focus) {
+        const activeEl = document.getElementById(target);
+        activeEl?.focus({ preventScroll: true });
+        // on phones the panel sits below the whole rail, so a tap seems to do
+        // nothing — bring the chosen lesson's widget into view.
+        if (window.matchMedia('(max-width: 1039px)').matches) {
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          activeEl?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        }
+      }
     };
 
     tabs.forEach((t) =>

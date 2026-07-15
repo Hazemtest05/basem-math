@@ -164,7 +164,7 @@ function mountGrapher(root: HTMLElement): void {
     const [lo, hi] = autoFitY(fns, view.xmin, view.xmax);
     view.ymin = lo; view.ymax = hi;
     redraw();
-    readout.textContent = 'مرّر المؤشّر فوق المنحني لقراءة قيمة f عند أيّ نقطة.';
+    readout.textContent = 'مرّر المؤشّر أو انقر فوق المنحني لقراءة قيمة f عند أيّ نقطة.';
   };
 
   const crosshair = (x: number): void => {
